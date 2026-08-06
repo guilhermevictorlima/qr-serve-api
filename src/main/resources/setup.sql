@@ -1,0 +1,36 @@
+CREATE TABLE categoria
+(
+    id        INTEGER GENERATED ALWAYS AS IDENTITY,
+    descricao VARCHAR(255) NOT NULL,
+
+    CONSTRAINT pk_categoria PRIMARY KEY (id)
+);
+
+CREATE TABLE item_cardapio
+(
+    id           INTEGER GENERATED ALWAYS AS IDENTITY,
+    categoria_id INTEGER        NOT NULL,
+    titulo       VARCHAR(255)   NOT NULL,
+    descricao    TEXT,
+    preco        DECIMAL(10, 2) NOT NULL,
+
+    CONSTRAINT pk_item_cardapio PRIMARY KEY (id),
+    CONSTRAINT fk_item_cardapio_categoria FOREIGN KEY (categoria_id)
+        REFERENCES categoria (id) ON DELETE RESTRICT
+);
+
+CREATE INDEX idx_item_cardapio_categoria_id ON item_cardapio (categoria_id);
+
+CREATE TABLE item_cardapio_imagem
+(
+    id               INTEGER GENERATED ALWAYS AS IDENTITY,
+    item_cardapio_id INTEGER      NOT NULL,
+    url              VARCHAR(500) NOT NULL,
+    ordem_exibicao   INTEGER      NOT NULL DEFAULT 0,
+
+    CONSTRAINT pk_item_cardapio_imagem PRIMARY KEY (id),
+    CONSTRAINT fk_item_cardapio_imagem_item_cardapio FOREIGN KEY (item_cardapio_id)
+        REFERENCES item_cardapio (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_item_cardapio_imagem_item_cardapio_id ON item_cardapio_imagem (item_cardapio_id);
