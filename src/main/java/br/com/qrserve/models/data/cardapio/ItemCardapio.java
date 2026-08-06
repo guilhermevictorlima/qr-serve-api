@@ -1,4 +1,4 @@
-package br.com.qrserve.models.cardapio;
+package br.com.qrserve.models.data.cardapio;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
