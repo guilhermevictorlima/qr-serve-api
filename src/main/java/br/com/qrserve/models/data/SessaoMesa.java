@@ -33,6 +33,12 @@ public class SessaoMesa {
     @Column(name = "data_hora_encerramento")
     private LocalDateTime dataHoraEncerramento;
 
+    public SessaoMesa() {}
+
+    public SessaoMesa(Integer id) {
+        this.id = id;
+    }
+
     public Integer getId() {
         return id;
     }
