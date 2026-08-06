@@ -26,10 +26,10 @@ public class ParticipanteSessao {
             foreignKey = @ForeignKey(name = "fk_participante_sessao_mesa"))
     private SessaoMesa sessao;
 
-    @Column(name = "token", nullable = false, unique = true, length = 255)
+    @Column(name = "token", nullable = false, unique = true)
     private String token;
 
-    @Column(name = "nome", nullable = false, length = 255)
+    @Column(name = "nome", nullable = false)
     private String nome;
 
     public ParticipanteSessao() {}

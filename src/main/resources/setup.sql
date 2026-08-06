@@ -52,13 +52,15 @@ CREATE TABLE mesa
 CREATE TABLE sessao_mesa
 (
     id                     INTEGER GENERATED ALWAYS AS IDENTITY,
-    mesa_id                INTEGER   NOT NULL,
-    data_hora_inicio       TIMESTAMP NOT NULL,
+    mesa_id                INTEGER      NOT NULL,
+    token                  VARCHAR(255) NOT NULL,
+    data_hora_inicio       TIMESTAMP    NOT NULL,
     data_hora_encerramento TIMESTAMP,
 
     CONSTRAINT pk_sessao_mesa PRIMARY KEY (id),
     CONSTRAINT fk_sessao_mesa_mesa FOREIGN KEY (mesa_id)
-        REFERENCES mesa (id) ON DELETE RESTRICT
+        REFERENCES mesa (id) ON DELETE RESTRICT,
+    CONSTRAINT uq_sessao_mesa_token UNIQUE (token)
 );
 
 CREATE INDEX idx_sessao_mesa_mesa_id ON sessao_mesa (mesa_id);

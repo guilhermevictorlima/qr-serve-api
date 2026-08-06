@@ -27,6 +27,9 @@ public class SessaoMesa {
             foreignKey = @ForeignKey(name = "fk_sessao_mesa_mesa"))
     private Mesa mesa;
 
+    @Column(name = "token", nullable = false, unique = true)
+    private String token;
+
     @Column(name = "data_hora_inicio", nullable = false)
     private LocalDateTime dataHoraInicio;
 
@@ -34,6 +37,12 @@ public class SessaoMesa {
     private LocalDateTime dataHoraEncerramento;
 
     public SessaoMesa() {}
+
+    public SessaoMesa(Mesa mesa, String token, LocalDateTime dataHoraInicio) {
+        this.mesa = mesa;
+        this.token = token;
+        this.dataHoraInicio = dataHoraInicio;
+    }
 
     public SessaoMesa(Integer id) {
         this.id = id;

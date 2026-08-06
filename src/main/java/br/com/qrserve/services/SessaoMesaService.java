@@ -1,12 +1,11 @@
 package br.com.qrserve.services;
 
+import br.com.qrserve.factory.SessaoMesaFactory;
 import br.com.qrserve.models.data.ParticipanteSessao;
 import br.com.qrserve.models.data.SessaoMesa;
-import br.com.qrserve.models.dto.SessaoMesaAtiva;
 import br.com.qrserve.models.dto.form.AcessarSessaoMesaForm;
 import br.com.qrserve.models.dto.response.AcessarSessaoMesaResponse;
 import br.com.qrserve.repositories.ParticipanteSessaoRepository;
-import br.com.qrserve.repositories.SessaoMesaRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +17,11 @@ public class SessaoMesaService {
 
     private static final int TEMPO_LIMITE_EM_MINUTOS_SESSAO_ABERTA = 3;
 
-    private final SessaoMesaRepository sessaoRepository;
+    private final SessaoMesaFactory sessaoMesaFactory;
     private final ParticipanteSessaoRepository participanteSessaoRepository;
 
-    public SessaoMesaService(SessaoMesaRepository sessaoRepository, ParticipanteSessaoRepository participanteSessaoRepository) {
-        this.sessaoRepository = sessaoRepository;
+    public SessaoMesaService(SessaoMesaFactory sessaoMesaFactory, ParticipanteSessaoRepository participanteSessaoRepository) {
+        this.sessaoMesaFactory = sessaoMesaFactory;
         this.participanteSessaoRepository = participanteSessaoRepository;
     }
 
@@ -30,28 +29,19 @@ public class SessaoMesaService {
     public AcessarSessaoMesaResponse acessar(AcessarSessaoMesaForm form) {
         final String tokenUsuario = UUID.randomUUID().toString();
 
-        Integer sessaoId = sessaoRepository.obterSessaoAtiva(form.mesaId())
-                .map(sessao -> {
-                    this.tentarEntrarNaSessao(sessao, form, tokenUsuario);
-                    return sessao.id();
-                })
-                .orElse(this.criarSessao(tokenUsuario));
+        SessaoMesa sessao = sessaoMesaFactory.obter(form.mesaId());
+        tentarEntrarNaSessao(sessao, form, tokenUsuario);
 
-        return new AcessarSessaoMesaResponse(tokenUsuario, sessaoId);
+        return new AcessarSessaoMesaResponse(tokenUsuario, sessao.getId());
     }
 
-    private void tentarEntrarNaSessao(SessaoMesaAtiva sessao, AcessarSessaoMesaForm form, String tokenUsuario) {
-        boolean jaPassouTempoLimiteDeSessaoAberta = LocalDateTime.now().isAfter(sessao.dataHoraInicio().plusMinutes(TEMPO_LIMITE_EM_MINUTOS_SESSAO_ABERTA));
+    private void tentarEntrarNaSessao(SessaoMesa sessaoMesa, AcessarSessaoMesaForm form, String tokenUsuario) {
+        boolean jaPassouTempoLimiteDeSessaoAberta = LocalDateTime.now().isAfter(sessaoMesa.getDataHoraInicio().plusMinutes(TEMPO_LIMITE_EM_MINUTOS_SESSAO_ABERTA));
         if (jaPassouTempoLimiteDeSessaoAberta) {
             // TODO solicitarEntrada
         } else {
-            participanteSessaoRepository.save(new ParticipanteSessao(new SessaoMesa(sessao.id()), tokenUsuario, form.nome()));
+            participanteSessaoRepository.save(new ParticipanteSessao(sessaoMesa, tokenUsuario, form.nome()));
         }
 
-    }
-
-    private Integer criarSessao(String tokenUsuario) {
-        // TODO chamar Factory
-        return 0;
     }
 }

@@ -19,6 +19,12 @@ public class Mesa {
     @Column(name = "numero_mesa", nullable = false)
     private Integer numeroMesa;
 
+    public Mesa() {}
+
+    public Mesa(Integer id) {
+        this.id = id;
+    }
+
     public Integer getId() {
         return id;
     }
