@@ -18,7 +18,7 @@ public class Categoria {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "descricao", nullable = false, length = 255)
+    @Column(name = "descricao", nullable = false)
     private String descricao;
 
     public Integer getId() {
