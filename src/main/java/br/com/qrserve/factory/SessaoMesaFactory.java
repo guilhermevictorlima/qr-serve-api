@@ -29,11 +29,14 @@ public class SessaoMesaFactory {
 
     private SessaoMesa criar(Integer mesaId) {
         LocalDateTime now = LocalDateTime.now();
-        String baseToken = RandomStringUtils.randomAlphanumeric(TAMANHO_TOKEN_SESSAO);
-
-        final String tokenSessao = baseToken + mesaId + now.format(DateTimeFormatter.ofPattern("ddMMyy"));
+        final String tokenSessao = gerarToken(mesaId, now);
 
         return sessaoRepository.save(new SessaoMesa(new Mesa(mesaId), tokenSessao, now));
+    }
+
+    private String gerarToken(Integer mesaId, LocalDateTime now) {
+        String baseToken = RandomStringUtils.randomAlphanumeric(TAMANHO_TOKEN_SESSAO);
+        return baseToken + mesaId + now.format(DateTimeFormatter.ofPattern("ddMMyy"));
     }
 
 }
