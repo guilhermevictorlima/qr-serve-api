@@ -1,3 +1,6 @@
+--------------------------------------------------------------------
+-------------- CARDAPIO --------------
+--------------------------------------------------------------------
 CREATE TABLE categoria
 (
     id        INTEGER GENERATED ALWAYS AS IDENTITY,
@@ -34,3 +37,28 @@ CREATE TABLE item_cardapio_imagem
 );
 
 CREATE INDEX idx_item_cardapio_imagem_item_cardapio_id ON item_cardapio_imagem (item_cardapio_id);
+
+--------------------------------------------------------------------
+-------------- MESA --------------
+--------------------------------------------------------------------
+CREATE TABLE mesa
+(
+    id          INTEGER GENERATED ALWAYS AS IDENTITY,
+    numero_mesa INTEGER NOT NULL,
+
+    CONSTRAINT pk_mesa PRIMARY KEY (id)
+);
+
+CREATE TABLE sessao_mesa
+(
+    id                     INTEGER GENERATED ALWAYS AS IDENTITY,
+    mesa_id                INTEGER   NOT NULL,
+    data_hora_inicio       TIMESTAMP NOT NULL,
+    data_hora_encerramento TIMESTAMP,
+
+    CONSTRAINT pk_sessao_mesa PRIMARY KEY (id),
+    CONSTRAINT fk_sessao_mesa_mesa FOREIGN KEY (mesa_id)
+        REFERENCES mesa (id) ON DELETE RESTRICT
+);
+
+CREATE INDEX idx_sessao_mesa_mesa_id ON sessao_mesa (mesa_id);
