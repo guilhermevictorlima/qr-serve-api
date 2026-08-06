@@ -33,9 +33,6 @@ public class ItemCardapioImagem {
     @Column(name = "ordem_exibicao", nullable = false)
     private Integer ordemExibicao = 0;
 
-    public ItemCardapioImagem() {
-    }
-
     public Integer getId() {
         return id;
     }

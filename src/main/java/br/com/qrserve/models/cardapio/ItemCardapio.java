@@ -45,9 +45,6 @@ public class ItemCardapio {
     @OrderBy("ordemExibicao ASC")
     private List<ItemCardapioImagem> imagens = new ArrayList<>();
 
-    public ItemCardapio() {
-    }
-
     public Integer getId() {
         return id;
     }
