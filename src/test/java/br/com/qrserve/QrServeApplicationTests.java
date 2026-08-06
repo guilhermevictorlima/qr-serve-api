@@ -1,4 +1,4 @@
-package com.rochacore.qrserve;
+package br.com.qrserve;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
