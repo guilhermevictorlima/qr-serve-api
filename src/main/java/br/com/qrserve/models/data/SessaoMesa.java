@@ -64,6 +64,14 @@ public class SessaoMesa {
         this.mesa = mesa;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public LocalDateTime getDataHoraInicio() {
         return dataHoraInicio;
     }
