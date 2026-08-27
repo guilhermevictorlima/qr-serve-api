@@ -11,6 +11,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "solicitacao_entrada_sessao")
 public class SolicitacaoEntradaSessao {
@@ -31,12 +33,16 @@ public class SolicitacaoEntradaSessao {
     @Column(name = "nome", nullable = false)
     private String nome;
 
+    @Column(name = "data_hora_solicitacao", nullable = false)
+    private LocalDateTime dataHoraSolicitacao;
+
     public SolicitacaoEntradaSessao() {}
 
-    public SolicitacaoEntradaSessao(SessaoMesa sessao, String token, String nome) {
+    public SolicitacaoEntradaSessao(SessaoMesa sessao, String token, String nome, LocalDateTime dataHoraSolicitacao) {
         this.sessao = sessao;
         this.token = token;
         this.nome = nome;
+        this.dataHoraSolicitacao = dataHoraSolicitacao;
     }
 
     public Integer getId() {
@@ -69,5 +75,13 @@ public class SolicitacaoEntradaSessao {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public LocalDateTime getDataHoraSolicitacao() {
+        return dataHoraSolicitacao;
+    }
+
+    public void setDataHoraSolicitacao(LocalDateTime dataHoraSolicitacao) {
+        this.dataHoraSolicitacao = dataHoraSolicitacao;
     }
 }

@@ -5,6 +5,7 @@ import br.com.qrserve.models.data.ParticipanteSessao;
 import br.com.qrserve.models.data.SessaoMesa;
 import br.com.qrserve.models.data.SolicitacaoEntradaSessao;
 import br.com.qrserve.models.dto.form.AcessarSessaoMesaForm;
+import br.com.qrserve.models.dto.form.ResponderSolicitacaoEntradaSessaoForm;
 import br.com.qrserve.models.dto.response.AcessarSessaoMesaResponse;
 import br.com.qrserve.models.dto.response.AcessarSessaoMesaResponseStatus;
 import br.com.qrserve.repositories.ParticipanteSessaoRepository;
@@ -45,11 +46,51 @@ public class SessaoMesaService {
         return new AcessarSessaoMesaResponse(tokenUsuario, sessao.getId(), responseStatus);
     }
 
+    // TODO implementar feedback em websocket ao solicitante e aos participantes da mesa
+    @Transactional(rollbackOn = Exception.class)
+    public void responderSolicitacaoEntradaSessao(ResponderSolicitacaoEntradaSessaoForm form) {
+        SolicitacaoEntradaSessao solicitacao = solicitacaoEntradaSessaoRepository
+                .obterSolicitacaoPorToken(form.tokenUsuarioSolicitante())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        format("Não foi encontrada uma solicitação de entrada feita por um usuário com este token -- tokenUsuarioSolicitante: {0}", form.tokenUsuarioSolicitante())
+                ));
+
+        ParticipanteSessao participanteRespondente = participanteSessaoRepository.obterParticipantePorToken(form.tokenUsuarioRespondente())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        format("Não foi encontrado um participante de sessão com esse token -- token: {0}", form.tokenUsuarioRespondente())
+                ));
+
+        if (form.resposta().isSolicitacaoAprovada()) {
+            participanteSessaoRepository.save(
+                    new ParticipanteSessao(
+                            solicitacao.getSessao(),
+                            solicitacao.getToken(),
+                            solicitacao.getNome()
+                    )
+            );
+
+            LOGGER.info(
+                    "SOLICITAÇÃO DE ENTRADA APROVADA -- solicitaçãoId: {} / idRespondente: {}",
+                    solicitacao.getId(),
+                    participanteRespondente.getId()
+            );
+        } else {
+            LOGGER.info(
+                    "SOLICITAÇÃO DE ENTRADA NEGADA -- solicitaçãoId: {} / idRespondente: {}",
+                    solicitacao.getId(),
+                    participanteRespondente.getId()
+            );
+        }
+
+        solicitacaoEntradaSessaoRepository.delete(solicitacao);
+    }
+
     private AcessarSessaoMesaResponseStatus tentarEntrarNaSessao(SessaoMesa sessaoMesa, AcessarSessaoMesaForm form, String tokenUsuario) {
-        boolean jaPassouTempoLimiteDeSessaoAberta = LocalDateTime.now().isAfter(sessaoMesa.getDataHoraInicio().plusMinutes(TEMPO_LIMITE_EM_MINUTOS_SESSAO_ABERTA));
+        LocalDateTime now = LocalDateTime.now();
+        boolean jaPassouTempoLimiteDeSessaoAberta = now.isAfter(sessaoMesa.getDataHoraInicio().plusMinutes(TEMPO_LIMITE_EM_MINUTOS_SESSAO_ABERTA));
         if (jaPassouTempoLimiteDeSessaoAberta) {
             LOGGER.warn(format("TEMPO DE ENTRADA LIVRE NA SESSÃO EXPIRADO -- {0} / tokenUsuario: {1}", form, tokenUsuario));
-            solicitacaoEntradaSessaoRepository.save(new SolicitacaoEntradaSessao(sessaoMesa, tokenUsuario, form.nome()));
+            solicitacaoEntradaSessaoRepository.save(new SolicitacaoEntradaSessao(sessaoMesa, tokenUsuario, form.nome(), now));
             return AcessarSessaoMesaResponseStatus.PERMISSAO_REQUERIDA;
         } else {
             participanteSessaoRepository.save(new ParticipanteSessao(sessaoMesa, tokenUsuario, form.nome()));
