@@ -79,3 +79,18 @@ CREATE TABLE participante_sessao
 );
 
 CREATE INDEX idx_participante_sessao_id ON participante_sessao (sessao_id);
+
+CREATE TABLE solicitacao_entrada_sessao
+(
+    id        INTEGER GENERATED ALWAYS AS IDENTITY,
+    sessao_id INTEGER      NOT NULL,
+    token     VARCHAR(255) NOT NULL,
+    nome      VARCHAR(255) NOT NULL,
+
+    CONSTRAINT pk_solicitacao_entrada_sessao PRIMARY KEY (id),
+    CONSTRAINT fk_solicitacao_sessao_mesa FOREIGN KEY (sessao_id)
+        REFERENCES sessao_mesa (id) ON DELETE CASCADE,
+    CONSTRAINT uq_solicitacao_usuario_token UNIQUE (token)
+);
+
+CREATE INDEX idx_solicitacao_entrada_sessao_id ON solicitacao_entrada_sessao(sessao_id);
