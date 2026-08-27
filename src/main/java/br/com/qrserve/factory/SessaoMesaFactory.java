@@ -23,8 +23,7 @@ public class SessaoMesaFactory {
 
     @Transactional
     public SessaoMesa obter(Integer mesaId) {
-        return sessaoRepository.obterSessaoAtiva(mesaId)
-                .orElse(this.criar(mesaId));
+        return sessaoRepository.obterSessaoAtiva(mesaId).orElseGet(() -> this.criar(mesaId));
     }
 
     private SessaoMesa criar(Integer mesaId) {
