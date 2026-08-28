@@ -89,7 +89,7 @@ public class SessaoMesaService {
         LocalDateTime now = LocalDateTime.now();
         boolean jaPassouTempoLimiteDeSessaoAberta = now.isAfter(sessaoMesa.getDataHoraInicio().plusMinutes(TEMPO_LIMITE_EM_MINUTOS_SESSAO_ABERTA));
         if (jaPassouTempoLimiteDeSessaoAberta) {
-            LOGGER.warn(format("TEMPO DE ENTRADA LIVRE NA SESSÃO EXPIRADO -- {0} / tokenUsuario: {1}", form, tokenUsuario));
+            LOGGER.warn("TEMPO DE ENTRADA LIVRE NA SESSÃO EXPIRADO -- {} / tokenUsuario: {}", form, tokenUsuario);
             solicitacaoEntradaSessaoRepository.save(new SolicitacaoEntradaSessao(sessaoMesa, tokenUsuario, form.nome(), now));
             return AcessarSessaoMesaResponseStatus.PERMISSAO_REQUERIDA;
         } else {
