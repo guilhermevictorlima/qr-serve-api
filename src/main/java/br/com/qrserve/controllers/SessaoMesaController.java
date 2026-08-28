@@ -7,14 +7,14 @@ import br.com.qrserve.services.SessaoMesaService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/session")
+@RequestMapping("/sessao")
 public class SessaoMesaController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SessaoMesaController.class);
 
@@ -24,15 +24,15 @@ public class SessaoMesaController {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping("/acessar")
     public AcessarSessaoMesaResponse acessar(@Valid @RequestBody AcessarSessaoMesaForm form) {
-        LOGGER.info("[POST]/session: " + form.toString());
+        LOGGER.info("[POST]/sessao/acessar: {}", form.toString());
         return service.acessar(form);
     }
 
-    @PutMapping("/solicitacao")
+    @PatchMapping("/solicitacao")
     public void responderSolicitacaoEntradaSessao(@Valid @RequestBody ResponderSolicitacaoEntradaSessaoForm form) {
-        LOGGER.info("[PUT]/session/solicitacao: " + form.toString());
+        LOGGER.info("[PUT]/sessao/solicitacao: {}", form.toString());
         service.responderSolicitacaoEntradaSessao(form);
     }
 
