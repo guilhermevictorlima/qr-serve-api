@@ -9,7 +9,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
@@ -30,9 +32,15 @@ class SessaoMesaFactoryTest {
 
     private static final int TAMANHO_TOKEN_SESSAO = 10;
     private static final DateTimeFormatter FORMATO_DATA_TOKEN = DateTimeFormatter.ofPattern("ddMMyy");
+    private static final ZoneId ZONE_ID_BRASIL = ZoneId.of("America/Sao_Paulo");
+    private static final LocalDateTime DATA_HORA_ATUAL = LocalDateTime.of(2026, 8, 28, 14, 23, 0);
+
 
     @Mock
     private SessaoMesaRepository sessaoRepository;
+
+    @Mock
+    private Clock clock;
 
     @InjectMocks
     private SessaoMesaFactory sessaoMesaFactory;
@@ -49,6 +57,14 @@ class SessaoMesaFactoryTest {
     void setUp() {
         mesaId = 7;
         sessaoCaptor = ArgumentCaptor.forClass(SessaoMesa.class);
+
+        when(clock.instant()).thenReturn(
+                DATA_HORA_ATUAL
+                        .atZone(ZONE_ID_BRASIL)
+                        .toInstant()
+        );
+
+        when(clock.getZone()).thenReturn(ZONE_ID_BRASIL);
     }
 
     @Test
@@ -108,7 +124,7 @@ class SessaoMesaFactoryTest {
     }
 
     private void dadoQueMesaPossuiSessaoAtiva() {
-        sessaoAtivaExistente = new SessaoMesa(new Mesa(mesaId), "token-existente-abc", LocalDateTime.now().minusMinutes(10));
+        sessaoAtivaExistente = new SessaoMesa(new Mesa(mesaId), "token-existente-abc", LocalDateTime.now(clock).minusMinutes(10));
         when(sessaoRepository.obterSessaoAtiva(mesaId)).thenReturn(Optional.of(sessaoAtivaExistente));
     }
 
@@ -125,7 +141,7 @@ class SessaoMesaFactoryTest {
     }
 
     private void dadoQueRepositorioSalvaSessaoComSucesso() {
-        sessaoRetornadaPeloSave = new SessaoMesa(new Mesa(mesaId), "token-persistido", LocalDateTime.now());
+        sessaoRetornadaPeloSave = new SessaoMesa(new Mesa(mesaId), "token-persistido", LocalDateTime.now(clock));
         when(sessaoRepository.save(any(SessaoMesa.class))).thenReturn(sessaoRetornadaPeloSave);
     }
 
@@ -177,9 +193,9 @@ class SessaoMesaFactoryTest {
     }
 
     private void quandoObterSessaoDaMesa() {
-        instanteAntesDaChamada = LocalDateTime.now();
+        instanteAntesDaChamada = LocalDateTime.now(clock);
         resultado = sessaoMesaFactory.obter(mesaId);
-        instanteDepoisDaChamada = LocalDateTime.now();
+        instanteDepoisDaChamada = LocalDateTime.now(clock);
     }
 
     private void deveBuscarPorSessaoAtiva() {

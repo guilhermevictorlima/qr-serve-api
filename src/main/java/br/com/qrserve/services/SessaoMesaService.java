@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -29,11 +30,13 @@ public class SessaoMesaService {
     private final SessaoMesaFactory sessaoMesaFactory;
     private final ParticipanteSessaoRepository participanteSessaoRepository;
     private final SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository;
+    private final Clock clock;
 
-    public SessaoMesaService(SessaoMesaFactory sessaoMesaFactory, ParticipanteSessaoRepository participanteSessaoRepository, SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository) {
+    public SessaoMesaService(SessaoMesaFactory sessaoMesaFactory, ParticipanteSessaoRepository participanteSessaoRepository, SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository, Clock clock) {
         this.sessaoMesaFactory = sessaoMesaFactory;
         this.participanteSessaoRepository = participanteSessaoRepository;
         this.solicitacaoEntradaSessaoRepository = solicitacaoEntradaSessaoRepository;
+        this.clock = clock;
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -86,7 +89,7 @@ public class SessaoMesaService {
     }
 
     private AcessarSessaoMesaResponseStatus tentarEntrarNaSessao(SessaoMesa sessaoMesa, AcessarSessaoMesaForm form, String tokenUsuario) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(clock);
         boolean jaPassouTempoLimiteDeSessaoAberta = now.isAfter(sessaoMesa.getDataHoraInicio().plusMinutes(TEMPO_LIMITE_EM_MINUTOS_SESSAO_ABERTA));
         if (jaPassouTempoLimiteDeSessaoAberta) {
             LOGGER.warn("TEMPO DE ENTRADA LIVRE NA SESSÃO EXPIRADO -- {} / tokenUsuario: {}", form, tokenUsuario);

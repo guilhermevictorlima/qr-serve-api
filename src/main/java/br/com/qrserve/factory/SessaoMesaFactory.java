@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -16,9 +17,11 @@ public class SessaoMesaFactory {
     private static final int TAMANHO_TOKEN_SESSAO = 10;
 
     private final SessaoMesaRepository sessaoRepository;
+    private final Clock clock;
 
-    public SessaoMesaFactory(SessaoMesaRepository sessaoRepository) {
+    public SessaoMesaFactory(SessaoMesaRepository sessaoRepository, Clock clock) {
         this.sessaoRepository = sessaoRepository;
+        this.clock = clock;
     }
 
     @Transactional
@@ -27,7 +30,7 @@ public class SessaoMesaFactory {
     }
 
     private SessaoMesa criar(Integer mesaId) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(clock);
         final String tokenSessao = gerarToken(mesaId, now);
 
         return sessaoRepository.save(new SessaoMesa(new Mesa(mesaId), tokenSessao, now));
