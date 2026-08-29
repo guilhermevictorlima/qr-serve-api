@@ -13,6 +13,10 @@ import jakarta.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * @deprecated Estrutura dos cardápios será reformulada na task QR-002
+ */
+@Deprecated(since = "QR-001", forRemoval = true)
 @Entity
 @Table(name = "item_cardapio_imagem")
 public class ItemCardapioImagem {
