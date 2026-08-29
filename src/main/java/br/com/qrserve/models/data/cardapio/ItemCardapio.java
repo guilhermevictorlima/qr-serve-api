@@ -18,6 +18,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @deprecated Estrutura dos cardápios será reformulada na task QR-002
+ */
+@Deprecated(since = "QR-001", forRemoval = true)
 @Entity
 @Table(name = "item_cardapio")
 public class ItemCardapio {
