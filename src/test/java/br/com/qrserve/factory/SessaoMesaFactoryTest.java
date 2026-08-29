@@ -9,9 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
@@ -23,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import br.com.qrserve.config.TimeConfig;
 import br.com.qrserve.models.data.Mesa;
 import br.com.qrserve.models.data.SessaoMesa;
 import br.com.qrserve.repositories.SessaoMesaRepository;
@@ -31,16 +30,17 @@ import br.com.qrserve.repositories.SessaoMesaRepository;
 class SessaoMesaFactoryTest {
 
     private static final int TAMANHO_TOKEN_SESSAO = 10;
-    private static final DateTimeFormatter FORMATO_DATA_TOKEN = DateTimeFormatter.ofPattern("ddMMyy");
-    private static final ZoneId ZONE_ID_BRASIL = ZoneId.of("America/Sao_Paulo");
-    private static final LocalDateTime DATA_HORA_ATUAL = LocalDateTime.of(2026, 8, 28, 14, 23, 0);
+    private static final DateTimeFormatter FORMATO_DATA_TOKEN =
+            DateTimeFormatter.ofPattern("ddMMyy");
 
+    private static final LocalDateTime DATA_HORA_ATUAL =
+            LocalDateTime.of(2026, 8, 28, 14, 23, 0);
 
     @Mock
     private SessaoMesaRepository sessaoRepository;
 
     @Mock
-    private Clock clock;
+    private TimeConfig timeConfig;
 
     @InjectMocks
     private SessaoMesaFactory sessaoMesaFactory;
@@ -50,27 +50,19 @@ class SessaoMesaFactoryTest {
     private SessaoMesa sessaoRetornadaPeloSave;
     private SessaoMesa resultado;
     private ArgumentCaptor<SessaoMesa> sessaoCaptor;
-    private LocalDateTime instanteAntesDaChamada;
-    private LocalDateTime instanteDepoisDaChamada;
 
     @BeforeEach
     void setUp() {
         mesaId = 7;
         sessaoCaptor = ArgumentCaptor.forClass(SessaoMesa.class);
-
-        when(clock.instant()).thenReturn(
-                DATA_HORA_ATUAL
-                        .atZone(ZONE_ID_BRASIL)
-                        .toInstant()
-        );
-
-        when(clock.getZone()).thenReturn(ZONE_ID_BRASIL);
     }
 
     @Test
     void quandoHouverSessaoAtivaNaoDeveCriarNova() {
         dadoQueMesaPossuiSessaoAtiva();
+
         quandoObterSessaoDaMesa();
+
         deveBuscarPorSessaoAtiva();
         deveRetornarASessaoExistente();
         deveNaoSalvarNovaSessao();
@@ -78,6 +70,7 @@ class SessaoMesaFactoryTest {
 
     @Test
     void dadoMesaSemSessaoAtiva_quandoObter_deveCriarNovaSessaoComTokenEDadosCorretos() {
+        dadoHorarioAtual();
         dadoQueMesaNaoPossuiSessaoAtiva();
         dadoQueRepositorioSalvaSessaoComSucesso();
 
@@ -88,7 +81,7 @@ class SessaoMesaFactoryTest {
         deveAssociarSessaoCriadaAMesaCorreta();
         deveGerarTokenComTamanhoEsperado();
         deveGerarTokenComSufixoDeDataCorreto();
-        deveDefinirDataHoraInicioProximaDoMomentoDaChamada();
+        deveDefinirDataHoraInicioCorreta();
         deveRetornarASessaoCriadaPeloRepositorio();
     }
 
@@ -98,107 +91,156 @@ class SessaoMesaFactoryTest {
 
         quandoObterSessaoDaMesa();
 
-        verify(sessaoRepository, times(1)).obterSessaoAtiva(eq(mesaId));
+        verify(sessaoRepository, times(1))
+                .obterSessaoAtiva(eq(mesaId));
     }
 
     @Test
     void dadoMesaIdNulo_quandoObter_deveConsultarRepositorioComNuloSemLancarExcecaoPropria() {
+        dadoHorarioAtual();
+
         mesaId = null;
-        when(sessaoRepository.obterSessaoAtiva(null)).thenReturn(Optional.empty());
+
+        when(sessaoRepository.obterSessaoAtiva(null))
+                .thenReturn(Optional.empty());
+
         dadoQueRepositorioSalvaSessaoComSucesso();
 
         quandoObterSessaoDaMesa();
 
-        verify(sessaoRepository, times(1)).obterSessaoAtiva(null);
-        verify(sessaoRepository, times(1)).save(any(SessaoMesa.class));
+        verify(sessaoRepository, times(1))
+                .obterSessaoAtiva(null);
+
+        verify(sessaoRepository, times(1))
+                .save(any(SessaoMesa.class));
     }
 
     @Test
     void dadoErroAoSalvarNovaSessao_quandoObter_devePropagarExcecao() {
+        dadoHorarioAtual();
         dadoQueMesaNaoPossuiSessaoAtiva();
         dadoQueRepositorioLancaErroAoSalvar();
 
-        assertThrows(RuntimeException.class, this::quandoObterSessaoDaMesa);
+        assertThrows(
+                RuntimeException.class,
+                this::quandoObterSessaoDaMesa
+        );
 
         deveTerTentadoSalvarUmaVez();
     }
 
+    private void dadoHorarioAtual() {
+        when(timeConfig.dataHoraAtual())
+                .thenReturn(DATA_HORA_ATUAL);
+    }
+
     private void dadoQueMesaPossuiSessaoAtiva() {
-        sessaoAtivaExistente = new SessaoMesa(new Mesa(mesaId), "token-existente-abc", LocalDateTime.now(clock).minusMinutes(10));
-        when(sessaoRepository.obterSessaoAtiva(mesaId)).thenReturn(Optional.of(sessaoAtivaExistente));
-    }
+        sessaoAtivaExistente = new SessaoMesa(
+                new Mesa(mesaId),
+                "token-existente-abc",
+                DATA_HORA_ATUAL.minusMinutes(10)
+        );
 
-    private void deveRetornarASessaoExistente() {
-        assertThat(resultado).isSameAs(sessaoAtivaExistente);
-    }
-
-    private void deveNaoSalvarNovaSessao() {
-        verify(sessaoRepository, never()).save(any(SessaoMesa.class));
+        when(sessaoRepository.obterSessaoAtiva(mesaId))
+                .thenReturn(Optional.of(sessaoAtivaExistente));
     }
 
     private void dadoQueMesaNaoPossuiSessaoAtiva() {
-        when(sessaoRepository.obterSessaoAtiva(mesaId)).thenReturn(Optional.empty());
+        when(sessaoRepository.obterSessaoAtiva(mesaId))
+                .thenReturn(Optional.empty());
     }
 
     private void dadoQueRepositorioSalvaSessaoComSucesso() {
-        sessaoRetornadaPeloSave = new SessaoMesa(new Mesa(mesaId), "token-persistido", LocalDateTime.now(clock));
-        when(sessaoRepository.save(any(SessaoMesa.class))).thenReturn(sessaoRetornadaPeloSave);
+        sessaoRetornadaPeloSave = new SessaoMesa(
+                new Mesa(mesaId),
+                "token-persistido",
+                DATA_HORA_ATUAL
+        );
+
+        when(sessaoRepository.save(any(SessaoMesa.class)))
+                .thenReturn(sessaoRetornadaPeloSave);
+    }
+
+    private void quandoObterSessaoDaMesa() {
+        resultado = sessaoMesaFactory.obter(mesaId);
+    }
+
+    private void deveBuscarPorSessaoAtiva() {
+        verify(sessaoRepository, times(1))
+                .obterSessaoAtiva(mesaId);
+    }
+
+    private void deveRetornarASessaoExistente() {
+        assertThat(resultado)
+                .isSameAs(sessaoAtivaExistente);
+    }
+
+    private void deveNaoSalvarNovaSessao() {
+        verify(sessaoRepository, never())
+                .save(any(SessaoMesa.class));
     }
 
     private void deveSalvarExatamenteUmaNovaSessao() {
-        verify(sessaoRepository, times(1)).save(sessaoCaptor.capture());
+        verify(sessaoRepository, times(1))
+                .save(sessaoCaptor.capture());
     }
 
     private void deveAssociarSessaoCriadaAMesaCorreta() {
         SessaoMesa sessaoCriada = sessaoCaptor.getValue();
-        assertThat(sessaoCriada.getMesa()).isNotNull();
-        assertThat(sessaoCriada.getMesa().getId()).isEqualTo(mesaId);
+
+        assertThat(sessaoCriada.getMesa())
+                .isNotNull();
+
+        assertThat(sessaoCriada.getMesa().getId())
+                .isEqualTo(mesaId);
     }
 
     private void deveGerarTokenComTamanhoEsperado() {
         String token = sessaoCaptor.getValue().getToken();
-        int tamanhoEsperado = TAMANHO_TOKEN_SESSAO + String.valueOf(mesaId).length() + 6;
 
-        assertThat(token).isNotBlank();
-        assertThat(token).hasSize(tamanhoEsperado);
+        int tamanhoEsperado =
+                TAMANHO_TOKEN_SESSAO
+                        + String.valueOf(mesaId).length()
+                        + 6;
+
+        assertThat(token)
+                .isNotBlank()
+                .hasSize(tamanhoEsperado);
     }
 
     private void deveGerarTokenComSufixoDeDataCorreto() {
         SessaoMesa sessaoCriada = sessaoCaptor.getValue();
-        String sufixoEsperado = sessaoCriada.getDataHoraInicio().format(FORMATO_DATA_TOKEN);
 
-        assertThat(sessaoCriada.getToken()).endsWith(sufixoEsperado);
+        String sufixoEsperado =
+                sessaoCriada
+                        .getDataHoraInicio()
+                        .format(FORMATO_DATA_TOKEN);
+
+        assertThat(sessaoCriada.getToken())
+                .endsWith(sufixoEsperado);
     }
 
-    private void deveDefinirDataHoraInicioProximaDoMomentoDaChamada() {
-        LocalDateTime dataHoraInicio = sessaoCaptor.getValue().getDataHoraInicio();
+    private void deveDefinirDataHoraInicioCorreta() {
+        SessaoMesa sessaoCriada = sessaoCaptor.getValue();
 
-        assertThat(dataHoraInicio).isNotNull();
-        assertThat(dataHoraInicio)
-                .isAfterOrEqualTo(instanteAntesDaChamada)
-                .isBeforeOrEqualTo(instanteDepoisDaChamada);
+        assertThat(sessaoCriada.getDataHoraInicio())
+                .isEqualTo(DATA_HORA_ATUAL);
     }
 
     private void deveRetornarASessaoCriadaPeloRepositorio() {
-        assertThat(resultado).isSameAs(sessaoRetornadaPeloSave);
+        assertThat(resultado)
+                .isSameAs(sessaoRetornadaPeloSave);
     }
 
     private void dadoQueRepositorioLancaErroAoSalvar() {
         when(sessaoRepository.save(any(SessaoMesa.class)))
-                .thenThrow(new RuntimeException("Falha simulada ao persistir sessão"));
+                .thenThrow(new RuntimeException(
+                        "Falha simulada ao persistir sessão"
+                ));
     }
 
     private void deveTerTentadoSalvarUmaVez() {
-        verify(sessaoRepository, times(1)).save(any(SessaoMesa.class));
-    }
-
-    private void quandoObterSessaoDaMesa() {
-        instanteAntesDaChamada = LocalDateTime.now(clock);
-        resultado = sessaoMesaFactory.obter(mesaId);
-        instanteDepoisDaChamada = LocalDateTime.now(clock);
-    }
-
-    private void deveBuscarPorSessaoAtiva() {
-        verify(sessaoRepository, times(1)).obterSessaoAtiva(mesaId);
+        verify(sessaoRepository, times(1))
+                .save(any(SessaoMesa.class));
     }
 }

@@ -1,5 +1,6 @@
 package br.com.qrserve.services;
 
+import br.com.qrserve.config.TimeConfig;
 import br.com.qrserve.factory.SessaoMesaFactory;
 import br.com.qrserve.models.data.ParticipanteSessao;
 import br.com.qrserve.models.data.SessaoMesa;
@@ -30,13 +31,13 @@ public class SessaoMesaService {
     private final SessaoMesaFactory sessaoMesaFactory;
     private final ParticipanteSessaoRepository participanteSessaoRepository;
     private final SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository;
-    private final Clock clock;
+    private final TimeConfig timeConfig;
 
-    public SessaoMesaService(SessaoMesaFactory sessaoMesaFactory, ParticipanteSessaoRepository participanteSessaoRepository, SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository, Clock clock) {
+    public SessaoMesaService(SessaoMesaFactory sessaoMesaFactory, ParticipanteSessaoRepository participanteSessaoRepository, SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository, TimeConfig timeConfig) {
         this.sessaoMesaFactory = sessaoMesaFactory;
         this.participanteSessaoRepository = participanteSessaoRepository;
         this.solicitacaoEntradaSessaoRepository = solicitacaoEntradaSessaoRepository;
-        this.clock = clock;
+        this.timeConfig = timeConfig;
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -89,7 +90,7 @@ public class SessaoMesaService {
     }
 
     private AcessarSessaoMesaResponseStatus tentarEntrarNaSessao(SessaoMesa sessaoMesa, AcessarSessaoMesaForm form, String tokenUsuario) {
-        LocalDateTime now = LocalDateTime.now(clock);
+        LocalDateTime now = timeConfig.dataHoraAtual();
         boolean jaPassouTempoLimiteDeSessaoAberta = now.isAfter(sessaoMesa.getDataHoraInicio().plusMinutes(TEMPO_LIMITE_EM_MINUTOS_SESSAO_ABERTA));
         if (jaPassouTempoLimiteDeSessaoAberta) {
             LOGGER.warn("TEMPO DE ENTRADA LIVRE NA SESSÃO EXPIRADO -- {} / tokenUsuario: {}", form, tokenUsuario);

@@ -1,5 +1,6 @@
 package br.com.qrserve.services;
 
+import br.com.qrserve.config.TimeConfig;
 import br.com.qrserve.factory.SessaoMesaFactory;
 import br.com.qrserve.models.data.ParticipanteSessao;
 import br.com.qrserve.models.data.SessaoMesa;
@@ -16,9 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +36,6 @@ class SessaoMesaServiceTest {
     private static final Integer SESSAO_ID = 10;
     private static final String NOME_USUARIO = "Guilherme";
 
-    private static final ZoneId ZONE_ID_BRASIL = ZoneId.of("America/Sao_Paulo");
     private static final LocalDateTime DATA_HORA_ATUAL = LocalDateTime.of(2026, 8, 28, 14, 23, 0);
 
     @Mock
@@ -50,7 +48,7 @@ class SessaoMesaServiceTest {
     private SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository;
 
     @Mock
-    private Clock clock;
+    private TimeConfig timeConfig;
 
     private SessaoMesaService service;
 
@@ -64,7 +62,7 @@ class SessaoMesaServiceTest {
                 sessaoMesaFactory,
                 participanteSessaoRepository,
                 solicitacaoEntradaSessaoRepository,
-                clock
+                timeConfig
         );
     }
 
@@ -122,13 +120,7 @@ class SessaoMesaServiceTest {
     }
 
     private void dadoHorarioAtual() {
-        when(clock.instant()).thenReturn(
-                DATA_HORA_ATUAL
-                        .atZone(ZONE_ID_BRASIL)
-                        .toInstant()
-        );
-
-        when(clock.getZone()).thenReturn(ZONE_ID_BRASIL);
+        when(timeConfig.dataHoraAtual()).thenReturn(DATA_HORA_ATUAL);
     }
 
     private void dadoUmaSessaoComInicioHaDoisMinutos() {
