@@ -1,3 +1,25 @@
+CREATE TABLE tenant (
+                        id INTEGER GENERATED ALWAYS AS IDENTITY,
+                        nome VARCHAR(50) NOT NULL,
+                        slug VARCHAR(50) NOT NULL UNIQUE,
+
+                        CONSTRAINT pk_tenant PRIMARY KEY (id)
+);
+
+CREATE TABLE estabelecimento (
+                                 id INTEGER GENERATED ALWAYS AS IDENTITY,
+                                 tenant_id INTEGER NOT NULL,
+                                 nome VARCHAR(255) NOT null,
+
+                                 CONSTRAINT pk_estabelecimento PRIMARY KEY (id),
+                                 CONSTRAINT fk_estabelecimento_tenant
+                                     FOREIGN KEY (tenant_id)
+                                         REFERENCES tenant (id)
+);
+
+CREATE INDEX idx_estabelecimento_tenant
+    ON estabelecimento (tenant_id);
+
 --------------------------------------------------------------------
 -------------- CARDAPIO --------------
 --------------------------------------------------------------------
@@ -45,9 +67,16 @@ CREATE TABLE mesa
 (
     id          INTEGER GENERATED ALWAYS AS IDENTITY,
     numero_mesa INTEGER NOT NULL,
+    estabelecimento_id INTEGER NOT NULL,
 
-    CONSTRAINT pk_mesa PRIMARY KEY (id)
+    CONSTRAINT pk_mesa PRIMARY KEY (id),
+    CONSTRAINT fk_menu_estabelecimento
+        FOREIGN KEY (estabelecimento_id)
+            REFERENCES estabelecimento (id)
 );
+
+CREATE INDEX idx_mesa_estabelecimento
+    ON mesa (estabelecimento_id);
 
 CREATE TABLE sessao_mesa
 (
