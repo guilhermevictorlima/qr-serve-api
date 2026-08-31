@@ -1,6 +1,5 @@
-package br.com.qrserve.services;
+package br.com.qrserve.application.sessao;
 
-import br.com.qrserve.application.sessao.SessaoMesaService;
 import br.com.qrserve.infrastructure.config.TimeConfig;
 import br.com.qrserve.domain.sessao.SessaoMesaFactory;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;

@@ -1,4 +1,4 @@
-package br.com.qrserve.factory;
+package br.com.qrserve.domain.sessao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-import br.com.qrserve.domain.sessao.SessaoMesaFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import br.com.qrserve.infrastructure.config.TimeConfig;
 import br.com.qrserve.domain.mesa.Mesa;
-import br.com.qrserve.domain.sessao.SessaoMesa;
 import br.com.qrserve.infrastructure.persistence.sessao.SessaoMesaRepository;
 
 @ExtendWith(MockitoExtension.class)

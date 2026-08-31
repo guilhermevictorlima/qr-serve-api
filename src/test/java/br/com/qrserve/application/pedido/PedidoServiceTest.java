@@ -1,6 +1,5 @@
-package br.com.qrserve.services;
+package br.com.qrserve.application.pedido;
 
-import br.com.qrserve.application.pedido.PedidoService;
 import br.com.qrserve.infrastructure.config.TimeConfig;
 import br.com.qrserve.domain.exception.BusinessException;
 import br.com.qrserve.domain.menu.MenuItem;
