@@ -5,6 +5,7 @@ import br.com.qrserve.domain.sessao.SessaoMesaFactory;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
 import br.com.qrserve.domain.sessao.SessaoMesa;
 import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
+import br.com.qrserve.domain.sessao.TokenUsuario;
 import br.com.qrserve.presentation.sessao.form.AcessarSessaoMesaForm;
 import br.com.qrserve.presentation.sessao.form.ResponderSolicitacaoEntradaSessaoForm;
 import br.com.qrserve.presentation.sessao.response.AcessarSessaoMesaResponse;
@@ -41,12 +42,12 @@ public class SessaoMesaService {
 
     @Transactional(rollbackOn = Exception.class)
     public AcessarSessaoMesaResponse acessar(AcessarSessaoMesaForm form) {
-        final String tokenUsuario = UUID.randomUUID().toString();
+        TokenUsuario tokenUsuario = TokenUsuario.create();
 
         SessaoMesa sessao = sessaoMesaFactory.obter(form.mesaId());
         AcessarSessaoMesaResponseStatus responseStatus = tentarEntrarNaSessao(sessao, form, tokenUsuario);
 
-        return new AcessarSessaoMesaResponse(tokenUsuario, sessao.getId(), responseStatus);
+        return new AcessarSessaoMesaResponse(tokenUsuario.valor(), sessao.getId(), responseStatus);
     }
 
     // TODO implementar feedback em websocket ao solicitante e aos participantes da mesa
@@ -88,7 +89,7 @@ public class SessaoMesaService {
         solicitacaoEntradaSessaoRepository.delete(solicitacao);
     }
 
-    private AcessarSessaoMesaResponseStatus tentarEntrarNaSessao(SessaoMesa sessaoMesa, AcessarSessaoMesaForm form, String tokenUsuario) {
+    private AcessarSessaoMesaResponseStatus tentarEntrarNaSessao(SessaoMesa sessaoMesa, AcessarSessaoMesaForm form, TokenUsuario tokenUsuario) {
         LocalDateTime now = timeProvider.dataHoraAtual();
         boolean jaPassouTempoLimiteDeSessaoAberta = now.isAfter(sessaoMesa.getDataHoraInicio().plusMinutes(TEMPO_LIMITE_EM_MINUTOS_SESSAO_ABERTA));
         if (jaPassouTempoLimiteDeSessaoAberta) {

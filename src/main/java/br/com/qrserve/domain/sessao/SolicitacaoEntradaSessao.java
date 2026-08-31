@@ -1,6 +1,7 @@
 package br.com.qrserve.domain.sessao;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -27,8 +28,8 @@ public class SolicitacaoEntradaSessao {
             foreignKey = @ForeignKey(name = "fk_participante_sessao_mesa"))
     private SessaoMesa sessao;
 
-    @Column(name = "token", nullable = false, unique = true)
-    private String token;
+    @Embedded
+    private TokenUsuario token;
 
     @Column(name = "nome", nullable = false)
     private String nome;
@@ -38,7 +39,7 @@ public class SolicitacaoEntradaSessao {
 
     public SolicitacaoEntradaSessao() {}
 
-    public SolicitacaoEntradaSessao(SessaoMesa sessao, String token, String nome, LocalDateTime dataHoraSolicitacao) {
+    public SolicitacaoEntradaSessao(SessaoMesa sessao, TokenUsuario token, String nome, LocalDateTime dataHoraSolicitacao) {
         this.sessao = sessao;
         this.token = token;
         this.nome = nome;
@@ -61,11 +62,11 @@ public class SolicitacaoEntradaSessao {
         this.sessao = sessao;
     }
 
-    public String getToken() {
+    public TokenUsuario getToken() {
         return token;
     }
 
-    public void setToken(String token) {
+    public void setToken(TokenUsuario token) {
         this.token = token;
     }
 

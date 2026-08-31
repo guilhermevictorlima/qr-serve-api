@@ -8,6 +8,6 @@ public record ParticipanteSessaoResponse(
     String nome
 ) {
     public static ParticipanteSessaoResponse from(ParticipanteSessao participanteSessao) {
-        return new ParticipanteSessaoResponse(participanteSessao.getSessao().getId(), participanteSessao.getToken(), participanteSessao.getNome());
+        return new ParticipanteSessaoResponse(participanteSessao.getSessao().getId(), participanteSessao.getToken().valor(), participanteSessao.getNome());
     }
 }
