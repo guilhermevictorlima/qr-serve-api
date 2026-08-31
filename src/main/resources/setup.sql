@@ -143,6 +143,10 @@ CREATE TABLE participante_sessao
 CREATE INDEX idx_participante_sessao_id ON participante_sessao (sessao_id);
 CREATE INDEX idx_participante_sessao_token ON participante_sessao (token);
 
+--------------------------------------------------------------------
+-------------- OPERACIONAL --------------
+--------------------------------------------------------------------
+
 CREATE TABLE solicitacao_entrada_sessao
 (
     id                    INTEGER GENERATED ALWAYS AS IDENTITY,
@@ -159,3 +163,26 @@ CREATE TABLE solicitacao_entrada_sessao
 
 CREATE INDEX idx_solicitacao_entrada_sessao_id ON solicitacao_entrada_sessao (sessao_id);
 CREATE INDEX idx_solicitacao_entrada_sessao_token ON solicitacao_entrada_sessao (token);
+
+CREATE TABLE pedido (
+    id                      INTEGER GENERATED ALWAYS AS IDENTITY,
+    participante_sessao_id  INTEGER NOT NULL,
+    menu_item_id            INTEGER NOT NULL,
+    valor_unitario          NUMERIC(10,2) NOT NULL,
+    quantidade              INTEGER NOT NULL,
+    status                  VARCHAR(30) NOT NULL,
+    data_hora_pedido        TIMESTAMP NOT NULL,
+    data_hora_cancelamento  TIMESTAMP,
+
+    CONSTRAINT pk_pedido PRIMARY KEY (id),
+    CONSTRAINT fk_pedido_participante_sessao FOREIGN KEY (participante_sessao_id)
+        REFERENCES participante_sessao (id),
+    CONSTRAINT fk_pedido_menu_item FOREIGN KEY (menu_item_id)
+        REFERENCES menu_item (id),
+    CONSTRAINT ck_pedido_quantidade_positiva CHECK (quantidade > 0),
+    CONSTRAINT ck_pedido_valor_unitario_positivo CHECK (valor_unitario > 0)
+);
+
+CREATE INDEX idx_pedido_participante_sessao_id ON pedido (participante_sessao_id);
+CREATE INDEX idx_pedido_menu_item_id ON pedido (menu_item_id);
+CREATE INDEX idx_pedido_status ON pedido (status);
