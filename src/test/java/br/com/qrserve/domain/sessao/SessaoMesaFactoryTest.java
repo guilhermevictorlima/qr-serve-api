@@ -136,7 +136,7 @@ class SessaoMesaFactoryTest {
     private void dadoQueMesaPossuiSessaoAtiva() {
         sessaoAtivaExistente = new SessaoMesa(
                 new Mesa(mesaId),
-                "token-existente-abc",
+                TokenSessao.create(mesaId, DATA_HORA_ATUAL.minusMinutes(10)),
                 DATA_HORA_ATUAL.minusMinutes(10)
         );
 
@@ -152,7 +152,7 @@ class SessaoMesaFactoryTest {
     private void dadoQueRepositorioSalvaSessaoComSucesso() {
         sessaoRetornadaPeloSave = new SessaoMesa(
                 new Mesa(mesaId),
-                "token-persistido",
+                TokenSessao.create(mesaId, DATA_HORA_ATUAL),
                 DATA_HORA_ATUAL
         );
 
@@ -195,7 +195,7 @@ class SessaoMesaFactoryTest {
     }
 
     private void deveGerarTokenComTamanhoEsperado() {
-        String token = sessaoCaptor.getValue().getToken();
+        String token = sessaoCaptor.getValue().getToken().getValor();
 
         int tamanhoEsperado =
                 TAMANHO_TOKEN_SESSAO
@@ -215,7 +215,7 @@ class SessaoMesaFactoryTest {
                         .getDataHoraInicio()
                         .format(FORMATO_DATA_TOKEN);
 
-        assertThat(sessaoCriada.getToken())
+        assertThat(sessaoCriada.getToken().getValor())
                 .endsWith(sufixoEsperado);
     }
 

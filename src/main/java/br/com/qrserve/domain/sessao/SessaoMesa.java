@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import br.com.qrserve.domain.mesa.Mesa;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -17,6 +18,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "sessao_mesa")
 public class SessaoMesa {
+    private static final int LIMITE_SESSAO_ABERTA_EM_MINUTOS = 3;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,8 +30,8 @@ public class SessaoMesa {
             foreignKey = @ForeignKey(name = "fk_sessao_mesa_mesa"))
     private Mesa mesa;
 
-    @Column(name = "token", nullable = false, unique = true)
-    private String token;
+    @Embedded
+    private TokenSessao token;
 
     @Column(name = "data_hora_inicio", nullable = false)
     private LocalDateTime dataHoraInicio;
@@ -39,7 +41,7 @@ public class SessaoMesa {
 
     public SessaoMesa() {}
 
-    public SessaoMesa(Mesa mesa, String token, LocalDateTime dataHoraInicio) {
+    public SessaoMesa(Mesa mesa, TokenSessao token, LocalDateTime dataHoraInicio) {
         this.mesa = mesa;
         this.token = token;
         this.dataHoraInicio = dataHoraInicio;
@@ -65,11 +67,11 @@ public class SessaoMesa {
         this.mesa = mesa;
     }
 
-    public String getToken() {
+    public TokenSessao getToken() {
         return token;
     }
 
-    public void setToken(String token) {
+    public void setToken(TokenSessao token) {
         this.token = token;
     }
 
