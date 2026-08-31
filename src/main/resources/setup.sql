@@ -1,20 +1,25 @@
-CREATE TABLE tenant (
-                        id INTEGER GENERATED ALWAYS AS IDENTITY,
-                        nome VARCHAR(50) NOT NULL,
-                        slug VARCHAR(50) NOT NULL UNIQUE,
+--------------------------------------------------------------------
+-------------- CORE --------------
+--------------------------------------------------------------------
+CREATE TABLE tenant
+(
+    id   INTEGER GENERATED ALWAYS AS IDENTITY,
+    nome VARCHAR(50) NOT NULL,
+    slug VARCHAR(50) NOT NULL UNIQUE,
 
-                        CONSTRAINT pk_tenant PRIMARY KEY (id)
+    CONSTRAINT pk_tenant PRIMARY KEY (id)
 );
 
-CREATE TABLE estabelecimento (
-                                 id INTEGER GENERATED ALWAYS AS IDENTITY,
-                                 tenant_id INTEGER NOT NULL,
-                                 nome VARCHAR(255) NOT null,
+CREATE TABLE estabelecimento
+(
+    id        INTEGER GENERATED ALWAYS AS IDENTITY,
+    tenant_id INTEGER      NOT NULL,
+    nome      VARCHAR(255) NOT null,
 
-                                 CONSTRAINT pk_estabelecimento PRIMARY KEY (id),
-                                 CONSTRAINT fk_estabelecimento_tenant
-                                     FOREIGN KEY (tenant_id)
-                                         REFERENCES tenant (id)
+    CONSTRAINT pk_estabelecimento PRIMARY KEY (id),
+    CONSTRAINT fk_estabelecimento_tenant
+        FOREIGN KEY (tenant_id)
+            REFERENCES tenant (id)
 );
 
 CREATE INDEX idx_estabelecimento_tenant
@@ -23,50 +28,79 @@ CREATE INDEX idx_estabelecimento_tenant
 --------------------------------------------------------------------
 -------------- CARDAPIO --------------
 --------------------------------------------------------------------
-CREATE TABLE categoria
+CREATE TABLE menu
 (
-    id        INTEGER GENERATED ALWAYS AS IDENTITY,
-    descricao VARCHAR(255) NOT NULL,
+    id            INTEGER GENERATED ALWAYS AS IDENTITY,
+    estabelecimento_id INTEGER NOT NULL,
 
-    CONSTRAINT pk_categoria PRIMARY KEY (id)
+    CONSTRAINT pk_menu PRIMARY KEY (id),
+    CONSTRAINT fk_menu_estabelecimento
+        FOREIGN KEY (estabelecimento_id)
+            REFERENCES estabelecimento (id)
 );
 
-CREATE TABLE item_cardapio
-(
-    id           INTEGER GENERATED ALWAYS AS IDENTITY,
-    categoria_id INTEGER        NOT NULL,
-    titulo       VARCHAR(255)   NOT NULL,
-    descricao    TEXT,
-    preco        DECIMAL(10, 2) NOT NULL,
+CREATE INDEX idx_menu_estabelecimento
+    ON menu (estabelecimento_id);
 
-    CONSTRAINT pk_item_cardapio PRIMARY KEY (id),
-    CONSTRAINT fk_item_cardapio_categoria FOREIGN KEY (categoria_id)
-        REFERENCES categoria (id) ON DELETE RESTRICT
+CREATE TABLE menu_secao
+(
+    id     INTEGER GENERATED ALWAYS AS IDENTITY,
+    menu_id           INTEGER NOT NULL,
+    posicao_ordenacao INTEGER,
+
+    CONSTRAINT pk_menu_secao PRIMARY KEY (id),
+    CONSTRAINT fk_menu_secao_menu
+        FOREIGN KEY (menu_id)
+            REFERENCES menu (id)
 );
 
-CREATE INDEX idx_item_cardapio_categoria_id ON item_cardapio (categoria_id);
+CREATE INDEX idx_menu_secao_menu
+    ON menu_secao (menu_id);
 
-CREATE TABLE item_cardapio_imagem
+
+CREATE TABLE menu_item
 (
-    id               INTEGER GENERATED ALWAYS AS IDENTITY,
-    item_cardapio_id INTEGER      NOT NULL,
-    url              VARCHAR(500) NOT NULL,
-    ordem_exibicao   INTEGER      NOT NULL DEFAULT 0,
+    id      INTEGER GENERATED ALWAYS AS IDENTITY,
+    menu_secao_id     INTEGER        NOT NULL,
+    nome              VARCHAR(255)   NOT NULL,
+    descricao         TEXT,
+    preco             NUMERIC(10, 2) NOT NULL,
+    posicao_ordenacao INTEGER,
+    status            VARCHAR(30) NOT NULL,
 
-    CONSTRAINT pk_item_cardapio_imagem PRIMARY KEY (id),
-    CONSTRAINT fk_item_cardapio_imagem_item_cardapio FOREIGN KEY (item_cardapio_id)
-        REFERENCES item_cardapio (id) ON DELETE CASCADE
+    CONSTRAINT pk_menu_item PRIMARY KEY (id),
+    CONSTRAINT fk_menu_item_menu_secao
+        FOREIGN KEY (menu_secao_id)
+            REFERENCES menu_secao (id)
 );
 
-CREATE INDEX idx_item_cardapio_imagem_item_cardapio_id ON item_cardapio_imagem (item_cardapio_id);
+CREATE INDEX idx_menu_item_menu_secao
+    ON menu_item (menu_secao_id);
+
+
+CREATE TABLE imagem_menu_item
+(
+    id INTEGER GENERATED ALWAYS AS IDENTITY,
+    menu_item_id        INTEGER NOT NULL,
+    url                 TEXT    NOT NULL,
+    posicao_ordenacao   INTEGER,
+
+    CONSTRAINT pk_imagem_menu_item PRIMARY KEY (id),
+    CONSTRAINT fk_imagem_menu_item_menu_item
+        FOREIGN KEY (menu_item_id)
+            REFERENCES menu_item (id)
+);
+
+CREATE INDEX idx_imagem_menu_item_menu_item
+    ON imagem_menu_item (menu_item_id);
 
 --------------------------------------------------------------------
 -------------- MESA --------------
 --------------------------------------------------------------------
 CREATE TABLE mesa
 (
-    id          INTEGER GENERATED ALWAYS AS IDENTITY,
-    numero_mesa INTEGER NOT NULL,
+    id                 INTEGER GENERATED ALWAYS AS IDENTITY,
+    numero_mesa        INTEGER NOT NULL,
     estabelecimento_id INTEGER NOT NULL,
 
     CONSTRAINT pk_mesa PRIMARY KEY (id),
@@ -110,13 +144,17 @@ CREATE TABLE participante_sessao
 CREATE INDEX idx_participante_sessao_id ON participante_sessao (sessao_id);
 CREATE INDEX idx_participante_sessao_token ON participante_sessao (token);
 
+--------------------------------------------------------------------
+-------------- OPERACIONAL --------------
+--------------------------------------------------------------------
+
 CREATE TABLE solicitacao_entrada_sessao
 (
-    id        				INTEGER GENERATED ALWAYS AS IDENTITY,
-    sessao_id 				INTEGER      NOT NULL,
-    token     				VARCHAR(255) NOT NULL,
-    nome      				VARCHAR(255) NOT NULL,
-    data_hora_solicitacao   TIMESTAMP    NOT null,
+    id                    INTEGER GENERATED ALWAYS AS IDENTITY,
+    sessao_id             INTEGER      NOT NULL,
+    token                 VARCHAR(255) NOT NULL,
+    nome                  VARCHAR(255) NOT NULL,
+    data_hora_solicitacao TIMESTAMP    NOT null,
 
     CONSTRAINT pk_solicitacao_entrada_sessao PRIMARY KEY (id),
     CONSTRAINT fk_solicitacao_sessao_mesa FOREIGN KEY (sessao_id)
@@ -124,5 +162,28 @@ CREATE TABLE solicitacao_entrada_sessao
     CONSTRAINT uq_solicitacao_usuario_token UNIQUE (token)
 );
 
-CREATE INDEX idx_solicitacao_entrada_sessao_id ON solicitacao_entrada_sessao(sessao_id);
-CREATE INDEX idx_solicitacao_entrada_sessao_token ON solicitacao_entrada_sessao(token);
+CREATE INDEX idx_solicitacao_entrada_sessao_id ON solicitacao_entrada_sessao (sessao_id);
+CREATE INDEX idx_solicitacao_entrada_sessao_token ON solicitacao_entrada_sessao (token);
+
+CREATE TABLE pedido (
+    id                      INTEGER GENERATED ALWAYS AS IDENTITY,
+    participante_sessao_id  INTEGER NOT NULL,
+    menu_item_id            INTEGER NOT NULL,
+    valor_unitario          NUMERIC(10,2) NOT NULL,
+    quantidade              INTEGER NOT NULL,
+    status                  VARCHAR(30) NOT NULL,
+    data_hora_pedido        TIMESTAMP NOT NULL,
+    data_hora_cancelamento  TIMESTAMP,
+
+    CONSTRAINT pk_pedido PRIMARY KEY (id),
+    CONSTRAINT fk_pedido_participante_sessao FOREIGN KEY (participante_sessao_id)
+        REFERENCES participante_sessao (id),
+    CONSTRAINT fk_pedido_menu_item FOREIGN KEY (menu_item_id)
+        REFERENCES menu_item (id),
+    CONSTRAINT ck_pedido_quantidade_positiva CHECK (quantidade > 0),
+    CONSTRAINT ck_pedido_valor_unitario_positivo CHECK (valor_unitario > 0)
+);
+
+CREATE INDEX idx_pedido_participante_sessao_id ON pedido (participante_sessao_id);
+CREATE INDEX idx_pedido_menu_item_id ON pedido (menu_item_id);
+CREATE INDEX idx_pedido_status ON pedido (status);
