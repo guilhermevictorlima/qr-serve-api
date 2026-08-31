@@ -1,12 +1,16 @@
 package br.com.qrserve.models.data;
 
+import br.com.qrserve.models.data.cardapio.MenuItem;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
@@ -20,11 +24,13 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "participante_sessao_id", nullable = false)
-    private Integer participanteSessaoId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "participante_sessao_id", nullable = false)
+    private ParticipanteSessao participanteSessao;
 
-    @Column(name = "menu_item_id", nullable = false)
-    private Integer menuItemId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "menu_item_id", nullable = false)
+    private MenuItem menuItem;
 
     @Column(name = "valor_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal valorUnitario;
@@ -46,20 +52,20 @@ public class Pedido {
         return id;
     }
 
-    public Integer getParticipanteSessaoId() {
-        return participanteSessaoId;
+    public ParticipanteSessao getParticipanteSessao() {
+        return participanteSessao;
     }
 
-    public void setParticipanteSessaoId(Integer participanteSessaoId) {
-        this.participanteSessaoId = participanteSessaoId;
+    public void setParticipanteSessaoId(ParticipanteSessao participanteSessao) {
+        this.participanteSessao = participanteSessao;
     }
 
-    public Integer getMenuItemId() {
-        return menuItemId;
+    public MenuItem getMenuItem() {
+        return menuItem;
     }
 
-    public void setMenuItemId(Integer menuItemId) {
-        this.menuItemId = menuItemId;
+    public void setMenuItemId(MenuItem menuItem) {
+        this.menuItem = menuItem;
     }
 
     public BigDecimal getValorUnitario() {
