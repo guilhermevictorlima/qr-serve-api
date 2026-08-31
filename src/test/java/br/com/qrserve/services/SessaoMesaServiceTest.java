@@ -1,15 +1,16 @@
 package br.com.qrserve.services;
 
-import br.com.qrserve.config.TimeConfig;
-import br.com.qrserve.factory.SessaoMesaFactory;
-import br.com.qrserve.models.data.ParticipanteSessao;
-import br.com.qrserve.models.data.SessaoMesa;
-import br.com.qrserve.models.data.SolicitacaoEntradaSessao;
-import br.com.qrserve.models.dto.form.AcessarSessaoMesaForm;
-import br.com.qrserve.models.dto.response.AcessarSessaoMesaResponse;
-import br.com.qrserve.models.dto.response.AcessarSessaoMesaResponseStatus;
-import br.com.qrserve.repositories.ParticipanteSessaoRepository;
-import br.com.qrserve.repositories.SolicitacaoEntradaSessaoRepository;
+import br.com.qrserve.application.sessao.SessaoMesaService;
+import br.com.qrserve.infrastructure.config.TimeConfig;
+import br.com.qrserve.domain.sessao.SessaoMesaFactory;
+import br.com.qrserve.domain.sessao.ParticipanteSessao;
+import br.com.qrserve.domain.sessao.SessaoMesa;
+import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
+import br.com.qrserve.presentation.sessao.form.AcessarSessaoMesaForm;
+import br.com.qrserve.presentation.sessao.response.AcessarSessaoMesaResponse;
+import br.com.qrserve.presentation.sessao.response.AcessarSessaoMesaResponseStatus;
+import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
+import br.com.qrserve.infrastructure.persistence.sessao.SolicitacaoEntradaSessaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

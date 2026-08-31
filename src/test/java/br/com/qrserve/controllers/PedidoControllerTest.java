@@ -1,7 +1,8 @@
 package br.com.qrserve.controllers;
 
-import br.com.qrserve.models.dto.form.CriarPedidoForm;
-import br.com.qrserve.services.PedidoService;
+import br.com.qrserve.presentation.pedido.form.CriarPedidoForm;
+import br.com.qrserve.presentation.pedido.PedidoController;
+import br.com.qrserve.application.pedido.PedidoService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

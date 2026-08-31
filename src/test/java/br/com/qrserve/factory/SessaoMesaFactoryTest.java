@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+import br.com.qrserve.domain.sessao.SessaoMesaFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,10 +22,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import br.com.qrserve.config.TimeConfig;
-import br.com.qrserve.models.data.Mesa;
-import br.com.qrserve.models.data.SessaoMesa;
-import br.com.qrserve.repositories.SessaoMesaRepository;
+import br.com.qrserve.infrastructure.config.TimeConfig;
+import br.com.qrserve.domain.mesa.Mesa;
+import br.com.qrserve.domain.sessao.SessaoMesa;
+import br.com.qrserve.infrastructure.persistence.sessao.SessaoMesaRepository;
 
 @ExtendWith(MockitoExtension.class)
 class SessaoMesaFactoryTest {
