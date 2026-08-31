@@ -16,12 +16,4 @@ public class TimeConfig {
         return Clock.system(ZoneId.of("America/Sao_Paulo"));
     }
 
-    public LocalDate dataAtual() {
-        return LocalDate.now(clock());
-    }
-
-    public LocalDateTime dataHoraAtual() {
-        return LocalDateTime.now(clock());
-    }
-
 }

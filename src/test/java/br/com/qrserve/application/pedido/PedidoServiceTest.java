@@ -1,6 +1,6 @@
 package br.com.qrserve.application.pedido;
 
-import br.com.qrserve.infrastructure.config.TimeConfig;
+import br.com.qrserve.application.time.TimeProvider;
 import br.com.qrserve.domain.exception.BusinessException;
 import br.com.qrserve.domain.menu.MenuItem;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
@@ -44,7 +44,7 @@ class PedidoServiceTest {
     private PedidoRepository pedidoRepository;
 
     @Mock
-    private TimeConfig timeConfig;
+    private TimeProvider timeProvider;
 
     private PedidoService pedidoService;
 
@@ -55,9 +55,9 @@ class PedidoServiceTest {
 
     @BeforeEach
     void setUp() {
-        pedidoService = new PedidoService(participanteSessaoRepository, menuItemRepository, pedidoRepository, timeConfig);
+        pedidoService = new PedidoService(participanteSessaoRepository, menuItemRepository, pedidoRepository, timeProvider);
 
-        when(timeConfig.dataHoraAtual()).thenReturn(LocalDateTime.of(2026, 8, 31, 11, 40, 50));
+        when(timeProvider.dataHoraAtual()).thenReturn(LocalDateTime.of(2026, 8, 31, 11, 40, 50));
     }
 
     private void dadoFormulario() {

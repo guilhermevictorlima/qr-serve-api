@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+import br.com.qrserve.application.time.TimeProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +22,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import br.com.qrserve.infrastructure.config.TimeConfig;
 import br.com.qrserve.domain.mesa.Mesa;
 import br.com.qrserve.infrastructure.persistence.sessao.SessaoMesaRepository;
 
@@ -39,7 +39,7 @@ class SessaoMesaFactoryTest {
     private SessaoMesaRepository sessaoRepository;
 
     @Mock
-    private TimeConfig timeConfig;
+    private TimeProvider timeProvider;
 
     @InjectMocks
     private SessaoMesaFactory sessaoMesaFactory;
@@ -129,7 +129,7 @@ class SessaoMesaFactoryTest {
     }
 
     private void dadoHorarioAtual() {
-        when(timeConfig.dataHoraAtual())
+        when(timeProvider.dataHoraAtual())
                 .thenReturn(DATA_HORA_ATUAL);
     }
 

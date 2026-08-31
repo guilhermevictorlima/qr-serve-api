@@ -1,6 +1,6 @@
 package br.com.qrserve.application.pedido;
 
-import br.com.qrserve.infrastructure.config.TimeConfig;
+import br.com.qrserve.application.time.TimeProvider;
 import br.com.qrserve.domain.exception.BusinessException;
 import br.com.qrserve.domain.menu.MenuItem;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
@@ -21,15 +21,15 @@ public class PedidoService {
     private final ParticipanteSessaoRepository participanteSessaoRepository;
     private final MenuItemRepository menuItemRepository;
     private final PedidoRepository pedidoRepository;
-    private final TimeConfig timeConfig;
+    private final TimeProvider timeProvider;
 
     public PedidoService(ParticipanteSessaoRepository participanteSessaoRepository,
                          MenuItemRepository menuItemRepository,
-                         PedidoRepository pedidoRepository, TimeConfig timeConfig) {
+                         PedidoRepository pedidoRepository, TimeProvider timeProvider) {
         this.participanteSessaoRepository = participanteSessaoRepository;
         this.menuItemRepository = menuItemRepository;
         this.pedidoRepository = pedidoRepository;
-        this.timeConfig = timeConfig;
+        this.timeProvider = timeProvider;
     }
 
     public CriarPedidoResponse criarPedido(CriarPedidoForm form) {
@@ -54,7 +54,7 @@ public class PedidoService {
         pedido.setValorUnitario(form.valorUnitario());
         pedido.setQuantidade(form.quantidade());
         pedido.setStatus(StatusPedido.PEDIDO_REALIZADO);
-        pedido.setDataHoraPedido(timeConfig.dataHoraAtual());
+        pedido.setDataHoraPedido(timeProvider.dataHoraAtual());
 
         pedidoRepository.save(pedido);
 
@@ -70,7 +70,7 @@ public class PedidoService {
         }
 
         pedido.setStatus(StatusPedido.PEDIDO_CANCELADO);
-        pedido.setDataHoraCancelamento(timeConfig.dataHoraAtual());
+        pedido.setDataHoraCancelamento(timeProvider.dataHoraAtual());
 
         pedidoRepository.save(pedido);
     }

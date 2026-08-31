@@ -1,6 +1,6 @@
 package br.com.qrserve.application.sessao;
 
-import br.com.qrserve.infrastructure.config.TimeConfig;
+import br.com.qrserve.application.time.TimeProvider;
 import br.com.qrserve.domain.sessao.SessaoMesaFactory;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
 import br.com.qrserve.domain.sessao.SessaoMesa;
@@ -48,7 +48,7 @@ class SessaoMesaServiceTest {
     private SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository;
 
     @Mock
-    private TimeConfig timeConfig;
+    private TimeProvider timeProvider;
 
     private SessaoMesaService service;
 
@@ -62,7 +62,7 @@ class SessaoMesaServiceTest {
                 sessaoMesaFactory,
                 participanteSessaoRepository,
                 solicitacaoEntradaSessaoRepository,
-                timeConfig
+                timeProvider
         );
     }
 
@@ -120,7 +120,7 @@ class SessaoMesaServiceTest {
     }
 
     private void dadoHorarioAtual() {
-        when(timeConfig.dataHoraAtual()).thenReturn(DATA_HORA_ATUAL);
+        when(timeProvider.dataHoraAtual()).thenReturn(DATA_HORA_ATUAL);
     }
 
     private void dadoUmaSessaoComInicioHaDoisMinutos() {

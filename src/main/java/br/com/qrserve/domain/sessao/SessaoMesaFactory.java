@@ -1,6 +1,6 @@
 package br.com.qrserve.domain.sessao;
 
-import br.com.qrserve.infrastructure.config.TimeConfig;
+import br.com.qrserve.application.time.TimeProvider;
 import br.com.qrserve.domain.mesa.Mesa;
 import br.com.qrserve.infrastructure.persistence.sessao.SessaoMesaRepository;
 import jakarta.transaction.Transactional;
@@ -16,11 +16,11 @@ public class SessaoMesaFactory {
     private static final int TAMANHO_TOKEN_SESSAO = 10;
 
     private final SessaoMesaRepository sessaoRepository;
-    private final TimeConfig timeConfig;
+    private final TimeProvider timeProvider;
 
-    public SessaoMesaFactory(SessaoMesaRepository sessaoRepository, TimeConfig timeConfig) {
+    public SessaoMesaFactory(SessaoMesaRepository sessaoRepository, TimeProvider timeProvider) {
         this.sessaoRepository = sessaoRepository;
-        this.timeConfig = timeConfig;
+        this.timeProvider = timeProvider;
     }
 
     @Transactional
@@ -29,7 +29,7 @@ public class SessaoMesaFactory {
     }
 
     private SessaoMesa criar(Integer mesaId) {
-        LocalDateTime now = timeConfig.dataHoraAtual();
+        LocalDateTime now = timeProvider.dataHoraAtual();
         final String tokenSessao = gerarToken(mesaId, now);
 
         return sessaoRepository.save(new SessaoMesa(new Mesa(mesaId), tokenSessao, now)); // TODO domain não deve se preocupar com persistência, somente com criação

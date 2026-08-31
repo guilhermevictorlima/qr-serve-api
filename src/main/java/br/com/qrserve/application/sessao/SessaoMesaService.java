@@ -1,6 +1,6 @@
 package br.com.qrserve.application.sessao;
 
-import br.com.qrserve.infrastructure.config.TimeConfig;
+import br.com.qrserve.application.time.TimeProvider;
 import br.com.qrserve.domain.sessao.SessaoMesaFactory;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
 import br.com.qrserve.domain.sessao.SessaoMesa;
@@ -30,13 +30,13 @@ public class SessaoMesaService {
     private final SessaoMesaFactory sessaoMesaFactory;
     private final ParticipanteSessaoRepository participanteSessaoRepository;
     private final SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository;
-    private final TimeConfig timeConfig;
+    private final TimeProvider timeProvider;
 
-    public SessaoMesaService(SessaoMesaFactory sessaoMesaFactory, ParticipanteSessaoRepository participanteSessaoRepository, SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository, TimeConfig timeConfig) {
+    public SessaoMesaService(SessaoMesaFactory sessaoMesaFactory, ParticipanteSessaoRepository participanteSessaoRepository, SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository, TimeProvider timeProvider) {
         this.sessaoMesaFactory = sessaoMesaFactory;
         this.participanteSessaoRepository = participanteSessaoRepository;
         this.solicitacaoEntradaSessaoRepository = solicitacaoEntradaSessaoRepository;
-        this.timeConfig = timeConfig;
+        this.timeProvider = timeProvider;
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -89,7 +89,7 @@ public class SessaoMesaService {
     }
 
     private AcessarSessaoMesaResponseStatus tentarEntrarNaSessao(SessaoMesa sessaoMesa, AcessarSessaoMesaForm form, String tokenUsuario) {
-        LocalDateTime now = timeConfig.dataHoraAtual();
+        LocalDateTime now = timeProvider.dataHoraAtual();
         boolean jaPassouTempoLimiteDeSessaoAberta = now.isAfter(sessaoMesa.getDataHoraInicio().plusMinutes(TEMPO_LIMITE_EM_MINUTOS_SESSAO_ABERTA));
         if (jaPassouTempoLimiteDeSessaoAberta) {
             LOGGER.warn("TEMPO DE ENTRADA LIVRE NA SESSÃO EXPIRADO -- {} / tokenUsuario: {}", form, tokenUsuario);
