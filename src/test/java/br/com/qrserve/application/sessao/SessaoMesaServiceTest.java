@@ -237,7 +237,7 @@ class SessaoMesaServiceTest {
 
         assertEquals(
                 response.tokenUsuario(),
-                participante.getToken().valor()
+                participante.getToken().getValor()
         );
     }
 
@@ -267,7 +267,7 @@ class SessaoMesaServiceTest {
 
         assertEquals(
                 response.tokenUsuario(),
-                solicitacao.getToken().valor()
+                solicitacao.getToken().getValor()
         );
 
         assertNotNull(solicitacao.getDataHoraSolicitacao());
