@@ -66,6 +66,7 @@ CREATE TABLE menu_item
     descricao         TEXT,
     preco             NUMERIC(10, 2) NOT NULL,
     posicao_ordenacao INTEGER,
+    status            VARCHAR(30) NOT NULL,
 
     CONSTRAINT pk_menu_item PRIMARY KEY (id),
     CONSTRAINT fk_menu_item_menu_secao

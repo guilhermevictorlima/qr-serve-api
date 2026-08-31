@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
@@ -47,6 +46,9 @@ public class MenuItem {
             orphanRemoval = true
     )
     private List<ImagemMenuItem> imagens = new ArrayList<>();
+
+    @Column(name = "status")
+    private StatusMenuItem status;
 
     public Integer getId() {
         return id;
@@ -98,5 +100,13 @@ public class MenuItem {
 
     public void setImagens(List<ImagemMenuItem> imagens) {
         this.imagens = imagens;
+    }
+
+    public StatusMenuItem getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusMenuItem status) {
+        this.status = status;
     }
 }
