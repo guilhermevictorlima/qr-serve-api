@@ -6,18 +6,20 @@ import jakarta.persistence.Embeddable;
 import java.util.UUID;
 
 @Embeddable
-public record TokenUsuario(
+public class TokenUsuario {
+
     @Column(name = "token", nullable = false, unique = true)
-    String valor
-) {
-    public TokenUsuario {
-        if (valor == null || valor.isBlank()) {
-            throw new IllegalArgumentException("Token não pode ser vazio");
-        }
+    private String valor;
+
+    private TokenUsuario(String valor) {
+        this.valor = valor;
     }
 
     public static TokenUsuario create() {
         return new TokenUsuario(UUID.randomUUID().toString());
     }
 
+    public String getValor() {
+        return valor;
+    }
 }

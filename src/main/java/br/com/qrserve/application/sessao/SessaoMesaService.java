@@ -47,7 +47,7 @@ public class SessaoMesaService {
         SessaoMesa sessao = sessaoMesaFactory.obter(form.mesaId());
         AcessarSessaoMesaResponseStatus responseStatus = tentarEntrarNaSessao(sessao, form, tokenUsuario);
 
-        return new AcessarSessaoMesaResponse(tokenUsuario.valor(), sessao.getId(), responseStatus);
+        return new AcessarSessaoMesaResponse(tokenUsuario.getValor(), sessao.getId(), responseStatus);
     }
 
     // TODO implementar feedback em websocket ao solicitante e aos participantes da mesa
