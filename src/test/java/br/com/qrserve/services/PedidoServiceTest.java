@@ -91,8 +91,8 @@ class PedidoServiceTest {
 
         Pedido pedidoPersistido = captor.getValue();
 
-        assertThat(pedidoPersistido.getParticipanteSessao()).isEqualTo(participanteSessao.getId());
-        assertThat(pedidoPersistido.getMenuItemId()).isEqualTo(menuItem.getId());
+        assertThat(pedidoPersistido.getParticipanteSessao().getId()).isEqualTo(participanteSessao.getId());
+        assertThat(pedidoPersistido.getMenuItem().getId()).isEqualTo(menuItem.getId());
         assertThat(pedidoPersistido.getValorUnitario()).isEqualByComparingTo(form.valorUnitario());
         assertThat(pedidoPersistido.getQuantidade()).isEqualTo(form.quantidade());
         assertThat(pedidoPersistido.getStatus()).isEqualTo(StatusPedido.PEDIDO_REALIZADO);
