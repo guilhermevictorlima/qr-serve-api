@@ -11,6 +11,8 @@ public class TokenUsuario {
     @Column(name = "token", nullable = false, unique = true)
     private String valor;
 
+    public TokenUsuario() {}
+
     private TokenUsuario(String valor) {
         this.valor = valor;
     }
