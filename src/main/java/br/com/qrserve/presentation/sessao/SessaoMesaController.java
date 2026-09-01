@@ -1,9 +1,10 @@
 package br.com.qrserve.presentation.sessao;
 
+import br.com.qrserve.application.sessao.AcessarSessaoUseCase;
+import br.com.qrserve.application.sessao.ResponderSolicitacaoEntradaSessaoUseCase;
 import br.com.qrserve.presentation.sessao.form.AcessarSessaoMesaForm;
 import br.com.qrserve.presentation.sessao.form.ResponderSolicitacaoEntradaSessaoForm;
 import br.com.qrserve.presentation.sessao.response.AcessarSessaoMesaResponse;
-import br.com.qrserve.application.sessao.SessaoMesaService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,22 +19,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class SessaoMesaController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SessaoMesaController.class);
 
-    private final SessaoMesaService service;
+    private final AcessarSessaoUseCase acessarSessaoUseCase;
+    private final ResponderSolicitacaoEntradaSessaoUseCase responderSolicitacaoEntradaSessaoUseCase;
 
-    public SessaoMesaController(SessaoMesaService service) {
-        this.service = service;
+    public SessaoMesaController(AcessarSessaoUseCase acessarSessaoUseCase, ResponderSolicitacaoEntradaSessaoUseCase responderSolicitacaoEntradaSessaoUseCase) {
+        this.acessarSessaoUseCase = acessarSessaoUseCase;
+        this.responderSolicitacaoEntradaSessaoUseCase = responderSolicitacaoEntradaSessaoUseCase;
     }
 
     @PostMapping("/acessar")
     public AcessarSessaoMesaResponse acessar(@Valid @RequestBody AcessarSessaoMesaForm form) {
         LOGGER.info("[POST]/sessao/acessar: {}", form.toString());
-        return service.acessar(form);
+        return acessarSessaoUseCase.execute(form);
     }
 
     @PatchMapping("/solicitacao")
     public void responderSolicitacaoEntradaSessao(@Valid @RequestBody ResponderSolicitacaoEntradaSessaoForm form) {
         LOGGER.info("[PUT]/sessao/solicitacao: {}", form.toString());
-        service.responderSolicitacaoEntradaSessao(form);
+        responderSolicitacaoEntradaSessaoUseCase.execute(form);
     }
 
 }

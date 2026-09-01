@@ -47,6 +47,10 @@ public class SessaoMesa {
         this.dataHoraInicio = dataHoraInicio;
     }
 
+    public static SessaoMesa create(Integer mesaId, LocalDateTime dataHoraAtual) {
+        return new SessaoMesa(new Mesa(mesaId), TokenSessao.create(mesaId, dataHoraAtual), dataHoraAtual);
+    }
+
     public SessaoMesa(Integer id) {
         this.id = id;
     }
@@ -89,5 +93,10 @@ public class SessaoMesa {
 
     public void setDataHoraEncerramento(LocalDateTime dataHoraEncerramento) {
         this.dataHoraEncerramento = dataHoraEncerramento;
+    }
+
+    public boolean isPermitidoEntrarNaSessao(LocalDateTime dataHoraAtual) {
+        LocalDateTime dataHoraLimite = dataHoraInicio.plusMinutes(LIMITE_SESSAO_ABERTA_EM_MINUTOS);
+        return !dataHoraAtual.isAfter(dataHoraLimite);
     }
 }

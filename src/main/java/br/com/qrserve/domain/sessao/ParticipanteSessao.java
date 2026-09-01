@@ -72,5 +72,9 @@ public class ParticipanteSessao {
     public void setNome(String nome) {
         this.nome = nome;
     }
+
+    public static ParticipanteSessao from(SolicitacaoEntradaSessao solicitacao) {
+        return new ParticipanteSessao(solicitacao.getSessao(), solicitacao.getToken(), solicitacao.getNome());
+    }
 }
 
