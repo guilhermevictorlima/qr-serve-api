@@ -35,7 +35,7 @@ public class AcessarSessaoUseCase {
         TokenUsuario token = TokenUsuario.create();
 
         SessaoMesa sessao = repository.obterSessaoAtiva(form.mesaId())
-                .orElse(repository.save(SessaoMesa.create(form.mesaId(), timeProvider.dataHoraAtual())));
+                .orElseGet(() -> repository.save(SessaoMesa.create(form.mesaId(), timeProvider.dataHoraAtual())));
 
         AcessarSessaoMesaResponseStatus responseStatus = tentarEntrarNaSessao(sessao, token, form.nome());
 

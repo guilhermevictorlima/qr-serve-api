@@ -84,6 +84,7 @@ class AcessarSessaoUseCaseTest {
         dadoSessaoAtiva();
         dadoEntradaPermitida(tempoMinutos);
         quandoAcessar();
+        naoDeveCriarNovaSessao();
         deveRegistrarParticipante();
         deveRetornarAcessoLiberado();
     }
@@ -94,6 +95,7 @@ class AcessarSessaoUseCaseTest {
         dadoSessaoAtiva();
         dadoEntradaNaoPermitida();
         quandoAcessar();
+        naoDeveCriarNovaSessao();
         deveRegistrarSolicitacaoEntrada();
         deveRetornarPermissaoRequerida();
     }
@@ -155,6 +157,10 @@ class AcessarSessaoUseCaseTest {
 
     private void deveRetornarPermissaoRequerida() {
         assertEquals(AcessarSessaoMesaResponseStatus.PERMISSAO_REQUERIDA, response.responseStatus());
+    }
+
+    private void naoDeveCriarNovaSessao() {
+        verify(repository, never()).save(any(SessaoMesa.class));
     }
 
 }
