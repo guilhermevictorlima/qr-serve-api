@@ -20,6 +20,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handle(
+            IllegalArgumentException exception
+    ) {
+        return ResponseEntity.badRequest().body(exception.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> tratarErroDeValidacao(
             MethodArgumentNotValidException exception
