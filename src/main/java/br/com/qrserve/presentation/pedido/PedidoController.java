@@ -1,8 +1,10 @@
 package br.com.qrserve.presentation.pedido;
 
+import br.com.qrserve.application.pedido.CancelarPedidoUseCase;
+import br.com.qrserve.application.pedido.ConcluirPedidoUseCase;
+import br.com.qrserve.application.pedido.CriarPedidoUseCase;
 import br.com.qrserve.presentation.pedido.form.CriarPedidoForm;
 import br.com.qrserve.presentation.pedido.response.CriarPedidoResponse;
-import br.com.qrserve.application.pedido.PedidoService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,24 +17,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/pedido")
 public class PedidoController {
 
-    private final PedidoService pedidoService;
+    private final CriarPedidoUseCase criarPedidoUseCase;
+    private final CancelarPedidoUseCase cancelarPedidoUseCase;
+    private final ConcluirPedidoUseCase concluirPedidoUseCase;
 
-    public PedidoController(PedidoService pedidoService) {
-        this.pedidoService = pedidoService;
+    public PedidoController(CriarPedidoUseCase criarPedidoUseCase, CancelarPedidoUseCase cancelarPedidoUseCase, ConcluirPedidoUseCase concluirPedidoUseCase) {
+        this.criarPedidoUseCase = criarPedidoUseCase;
+        this.cancelarPedidoUseCase = cancelarPedidoUseCase;
+        this.concluirPedidoUseCase = concluirPedidoUseCase;
     }
 
     @PostMapping
     public CriarPedidoResponse realizarPedido(@Valid @RequestBody CriarPedidoForm form) {
-        return pedidoService.criarPedido(form);
+        return criarPedidoUseCase.execute(form);
     }
 
     @PatchMapping("/{id}/cancelar")
     public void cancelarPedido(@PathVariable Integer id) {
-        pedidoService.cancelarPedido(id);
+        cancelarPedidoUseCase.execute(id);
     }
 
     @PatchMapping("/{id}/concluir")
     public void concluirPedido(@PathVariable Integer id) {
-        pedidoService.concluirPedido(id);
+        concluirPedidoUseCase.execute(id);
     }
 }

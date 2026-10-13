@@ -1,7 +1,9 @@
 package br.com.qrserve.presentation.pedido;
 
+import br.com.qrserve.application.pedido.CancelarPedidoUseCase;
+import br.com.qrserve.application.pedido.ConcluirPedidoUseCase;
+import br.com.qrserve.application.pedido.CriarPedidoUseCase;
 import br.com.qrserve.presentation.pedido.form.CriarPedidoForm;
-import br.com.qrserve.application.pedido.PedidoService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,13 @@ class PedidoControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private PedidoService pedidoService;
+    private CriarPedidoUseCase criarPedidoUseCase;
+
+    @MockitoBean
+    private CancelarPedidoUseCase cancelarPedidoUseCase;
+
+    @MockitoBean
+    private ConcluirPedidoUseCase concluirPedidoUseCase;
 
     @Test
     @DisplayName("Dado formulário válido, quando realizar pedido, deve criar pedido")
@@ -40,7 +48,7 @@ class PedidoControllerTest {
 
         quandoRealizarPedido(form);
 
-        verify(pedidoService).criarPedido(any(CriarPedidoForm.class));
+        verify(criarPedidoUseCase).execute(any(CriarPedidoForm.class));
     }
 
     @Test
@@ -179,6 +187,6 @@ class PedidoControllerTest {
     }
 
     private void deveNaoCriarPedido() {
-        verify(pedidoService, never()).criarPedido(any());
+        verify(criarPedidoUseCase, never()).execute(any());
     }
 }
