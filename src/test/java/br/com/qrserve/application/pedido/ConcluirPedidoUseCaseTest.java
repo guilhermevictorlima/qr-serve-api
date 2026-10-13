@@ -1,5 +1,7 @@
 package br.com.qrserve.application.pedido;
 
+import br.com.qrserve.domain.exception.PedidoNaoEncontradoException;
+import br.com.qrserve.domain.exception.BusinessException;
 import br.com.qrserve.domain.pedido.Pedido;
 import br.com.qrserve.domain.pedido.StatusPedido;
 import br.com.qrserve.infrastructure.persistence.pedido.PedidoRepository;
@@ -15,6 +17,7 @@ import org.mockito.Mock;
 
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -35,6 +38,7 @@ class ConcluirPedidoUseCaseTest {
 
     private Pedido pedido;
     private Exception exception;
+    private Class<? extends Exception> tipoEsperadoException;
     private String mensagemEsperadaException;
 
     @Test
@@ -74,6 +78,7 @@ class ConcluirPedidoUseCaseTest {
                 .thenReturn(Optional.empty());
 
         mensagemEsperadaException = "Pedido não encontrado";
+        tipoEsperadoException = PedidoNaoEncontradoException.class;
     }
 
     private void dadoPedidoNaoEstiverEmAberto() {
@@ -84,6 +89,7 @@ class ConcluirPedidoUseCaseTest {
                 .thenReturn(Optional.of(pedido));
 
         mensagemEsperadaException = "O pedido precisa estar em aberto para ser concluído";
+        tipoEsperadoException = BusinessException.class;
     }
 
     private void quandoConcluirPedido() {
@@ -104,6 +110,7 @@ class ConcluirPedidoUseCaseTest {
 
     private void deveRejeitarConclusaoDoPedido() {
         assertNotNull(exception);
+        assertInstanceOf(tipoEsperadoException, exception);
         assertEquals(mensagemEsperadaException, exception.getMessage());
 
         verify(pedidoRepository, never())

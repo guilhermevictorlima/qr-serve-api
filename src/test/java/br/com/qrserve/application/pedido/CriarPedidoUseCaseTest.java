@@ -1,5 +1,7 @@
 package br.com.qrserve.application.pedido;
 
+import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
+import br.com.qrserve.domain.exception.MenuItemNaoEncontradoException;
 import br.com.qrserve.application.time.TimeProvider;
 import br.com.qrserve.domain.menu.MenuItem;
 import br.com.qrserve.domain.pedido.Pedido;
@@ -27,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,6 +69,7 @@ class CriarPedidoUseCaseTest {
     private Pedido pedido;
     private CriarPedidoResponse response;
     private Exception exception;
+    private Class<? extends Exception> tipoEsperadoException;
     private String mensagemEsperadaException;
 
     @BeforeEach
@@ -128,6 +132,7 @@ class CriarPedidoUseCaseTest {
                 .thenReturn(Optional.empty());
 
         mensagemEsperadaException = "Usuário não reconhecido, por favor tente novamente";
+        tipoEsperadoException = ParticipanteSessaoNaoEncontradoException.class;
     }
 
     private void dadoMenuItemInexistente() {
@@ -135,6 +140,7 @@ class CriarPedidoUseCaseTest {
                 .thenReturn(Optional.empty());
 
         mensagemEsperadaException = "Não foi encontrado o item do menu para realizar o pedido, tente novamente";
+        tipoEsperadoException = MenuItemNaoEncontradoException.class;
     }
 
     private void quandoCriarPedido() {
@@ -171,6 +177,7 @@ class CriarPedidoUseCaseTest {
 
     private void deveRejeitarCriacaoDoPedido() {
         assertNotNull(exception);
+        assertInstanceOf(tipoEsperadoException, exception);
         assertEquals(mensagemEsperadaException, exception.getMessage());
 
         verify(pedidoRepository, never())

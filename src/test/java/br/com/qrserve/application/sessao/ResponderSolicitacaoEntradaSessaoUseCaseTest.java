@@ -1,5 +1,7 @@
 package br.com.qrserve.application.sessao;
 
+import br.com.qrserve.domain.exception.SolicitacaoEntradaSessaoNaoEncontradaException;
+import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
 import br.com.qrserve.domain.sessao.SessaoMesa;
 import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
@@ -21,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -52,6 +55,7 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
     private SolicitacaoEntradaSessao solicitacao;
     private ParticipanteSessao participanteRespondente;
     private Exception exception;
+    private Class<? extends Exception> tipoEsperadoException;
     private String mensagemEsperadaException;
 
     @Test
@@ -147,6 +151,7 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
                 .thenReturn(Optional.empty());
 
         mensagemEsperadaException = "Solicitação de entrada não encontrada. Verifique se já foi respondida e tente novamente";
+        tipoEsperadoException = SolicitacaoEntradaSessaoNaoEncontradaException.class;
     }
 
     private void dadoParticipanteRespondenteInexistente() {
@@ -155,6 +160,7 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
                 .thenReturn(Optional.empty());
 
         mensagemEsperadaException = "Participante respondente não encontrado, token identificador inválido";
+        tipoEsperadoException = ParticipanteSessaoNaoEncontradoException.class;
     }
 
     private void quandoResponderSolicitacao() {
@@ -187,6 +193,7 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
 
     private void deveRejeitarResposta() {
         assertNotNull(exception);
+        assertInstanceOf(tipoEsperadoException, exception);
         assertEquals(mensagemEsperadaException, exception.getMessage());
 
         verify(participanteSessaoRepository, never())
