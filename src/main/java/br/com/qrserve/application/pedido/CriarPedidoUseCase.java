@@ -2,6 +2,8 @@ package br.com.qrserve.application.pedido;
 
 import br.com.qrserve.application.time.TimeProvider;
 import br.com.qrserve.domain.exception.BusinessException;
+import br.com.qrserve.domain.exception.MenuItemNaoEncontradoException;
+import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.menu.MenuItem;
 import br.com.qrserve.domain.pedido.Pedido;
 import br.com.qrserve.domain.pedido.StatusPedido;
@@ -52,7 +54,7 @@ public class CriarPedidoUseCase {
         return menuItemRepository.findById(form.menuItemId())
                 .orElseThrow(() -> {
                     LOGGER.error("Item do menu não encontrado -- {}", form);
-                    return new IllegalArgumentException("Não foi encontrado o item do menu para realizar o pedido, tente novamente");
+                    return new MenuItemNaoEncontradoException("Não foi encontrado o item do menu para realizar o pedido, tente novamente");
                 });
     }
 
@@ -61,7 +63,7 @@ public class CriarPedidoUseCase {
                 .obterParticipantePorToken(form.tokenUsuario())
                 .orElseThrow(() -> {
                     LOGGER.error("Usuário não encontrado -- {}", form);
-                    return new IllegalArgumentException("Usuário não reconhecido, por favor tente novamente");
+                    return new ParticipanteSessaoNaoEncontradoException("Usuário não reconhecido, por favor tente novamente");
                 });
     }
 

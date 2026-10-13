@@ -2,6 +2,7 @@ package br.com.qrserve.application.pedido;
 
 import br.com.qrserve.application.time.TimeProvider;
 import br.com.qrserve.domain.exception.BusinessException;
+import br.com.qrserve.domain.exception.PedidoNaoEncontradoException;
 import br.com.qrserve.domain.pedido.Pedido;
 import br.com.qrserve.domain.pedido.StatusPedido;
 import br.com.qrserve.infrastructure.persistence.pedido.PedidoRepository;
@@ -41,7 +42,7 @@ public class CancelarPedidoUseCase {
         return pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> {
                     LOGGER.error("PEDIDO NÃO ENCONTRADO -- {}", pedidoId);
-                   return new IllegalArgumentException("Pedido não encontrado");
+                    return new PedidoNaoEncontradoException("Pedido não encontrado");
                 });
     }
 

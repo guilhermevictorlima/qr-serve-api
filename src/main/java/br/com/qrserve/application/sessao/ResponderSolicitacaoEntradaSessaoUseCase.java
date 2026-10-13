@@ -1,5 +1,7 @@
 package br.com.qrserve.application.sessao;
 
+import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
+import br.com.qrserve.domain.exception.SolicitacaoEntradaSessaoNaoEncontradaException;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
 import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
@@ -43,7 +45,7 @@ public class ResponderSolicitacaoEntradaSessaoUseCase {
                 .obterSolicitacaoPorToken(form.tokenUsuarioSolicitante())
                 .orElseThrow(() -> {
                     LOGGER.error("SOLICITAÇÃO NÃO ENCONTRADA -- {}", form);
-                    return new IllegalArgumentException("Solicitação de entrada não encontrada. Verifique se já foi respondida e tente novamente");
+                    return new SolicitacaoEntradaSessaoNaoEncontradaException("Solicitação de entrada não encontrada. Verifique se já foi respondida e tente novamente");
                 });
     }
 
@@ -51,7 +53,7 @@ public class ResponderSolicitacaoEntradaSessaoUseCase {
         return participanteSessaoRepository.obterParticipantePorToken(form.tokenUsuarioRespondente())
                 .orElseThrow(() -> {
                     LOGGER.error("PARTICIPANTE NÃO ENCONTRADO -- {}", form);
-                    return new IllegalArgumentException("Participante respondente não encontrado, token identificador inválido");
+                    return new ParticipanteSessaoNaoEncontradoException("Participante respondente não encontrado, token identificador inválido");
                 });
     }
 

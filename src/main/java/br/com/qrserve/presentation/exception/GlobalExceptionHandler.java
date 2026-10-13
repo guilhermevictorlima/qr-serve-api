@@ -1,6 +1,7 @@
 package br.com.qrserve.presentation.exception;
 
 import br.com.qrserve.domain.exception.BusinessException;
+import br.com.qrserve.domain.exception.RecursoNaoEncontradoException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,9 +21,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(RecursoNaoEncontradoException.class)
     public ResponseEntity<String> handle(
-            IllegalArgumentException exception
+            RecursoNaoEncontradoException exception
     ) {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
