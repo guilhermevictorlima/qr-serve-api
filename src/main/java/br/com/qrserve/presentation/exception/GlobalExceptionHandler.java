@@ -2,6 +2,7 @@ package br.com.qrserve.presentation.exception;
 
 import br.com.qrserve.domain.exception.BusinessException;
 import br.com.qrserve.domain.exception.RecursoNaoEncontradoException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handle(
             RecursoNaoEncontradoException exception
     ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
