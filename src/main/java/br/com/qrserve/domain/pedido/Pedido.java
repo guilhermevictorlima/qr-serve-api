@@ -108,4 +108,8 @@ public class Pedido {
     public void setDataHoraCancelamento(LocalDateTime dataHoraCancelamento) {
         this.dataHoraCancelamento = dataHoraCancelamento;
     }
+
+    public boolean isPedidoEmAberto() {
+        return status == StatusPedido.PEDIDO_REALIZADO;
+    }
 }
