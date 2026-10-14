@@ -8,6 +8,7 @@ import br.com.qrserve.domain.menu.MenuItem;
 import br.com.qrserve.domain.pedido.Pedido;
 import br.com.qrserve.domain.pedido.StatusPedido;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
+import br.com.qrserve.domain.sessao.SessaoMesa;
 import br.com.qrserve.infrastructure.persistence.menu.MenuItemRepository;
 import br.com.qrserve.infrastructure.persistence.pedido.PedidoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
@@ -17,6 +18,8 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 public class CriarPedidoUseCase {
@@ -38,6 +41,7 @@ public class CriarPedidoUseCase {
     public CriarPedidoResponse execute(CriarPedidoForm form) {
         ParticipanteSessao participanteSessao = obterParticipanteSessao(form);
         MenuItem menuItem = obterMenuItem(form);
+        validarPedidoPermitido(participanteSessao, menuItem);
 
         Pedido pedido = new Pedido();
         pedido.setParticipanteSessaoId(participanteSessao);
@@ -48,6 +52,25 @@ public class CriarPedidoUseCase {
         pedido.setDataHoraPedido(timeProvider.dataHoraAtual());
 
         return CriarPedidoResponse.from(pedidoRepository.save(pedido));
+    }
+
+    private void validarPedidoPermitido(ParticipanteSessao participanteSessao, MenuItem menuItem) {
+        SessaoMesa sessao = participanteSessao.getSessao();
+
+        if (sessao.isEncerrada()) {
+            LOGGER.error("Sessão encerrada -- sessaoId: {}", sessao.getId());
+            throw new BusinessException("A sessão da mesa foi encerrada, não é possível realizar pedidos");
+        }
+
+        if (!Objects.equals(sessao.getEstabelecimento().getId(), menuItem.getEstabelecimento().getId())) {
+            LOGGER.error("Item do menu de outro estabelecimento -- sessaoId: {} / menuItemId: {}", sessao.getId(), menuItem.getId());
+            throw new MenuItemNaoEncontradoException("Não foi encontrado o item do menu para realizar o pedido, tente novamente");
+        }
+
+        if (!menuItem.isDisponivel()) {
+            LOGGER.error("Item do menu indisponível -- menuItemId: {}", menuItem.getId());
+            throw new BusinessException("O item do menu está indisponível no momento");
+        }
     }
 
     private MenuItem obterMenuItem(CriarPedidoForm form) {

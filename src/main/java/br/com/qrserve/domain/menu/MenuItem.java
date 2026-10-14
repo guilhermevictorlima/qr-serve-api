@@ -1,5 +1,6 @@
 package br.com.qrserve.domain.menu;
 
+import br.com.qrserve.domain.estabelecimento.Estabelecimento;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -103,6 +104,14 @@ public class MenuItem {
 
     public void setImagens(List<ImagemMenuItem> imagens) {
         this.imagens = imagens;
+    }
+
+    public boolean isDisponivel() {
+        return status == StatusMenuItem.DISPONIVEL;
+    }
+
+    public Estabelecimento getEstabelecimento() {
+        return menuSecao.getMenu().getEstabelecimento();
     }
 
     public StatusMenuItem getStatus() {

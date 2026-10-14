@@ -3,7 +3,13 @@ package br.com.qrserve.application.pedido;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.exception.MenuItemNaoEncontradoException;
 import br.com.qrserve.application.time.TimeProvider;
+import br.com.qrserve.domain.estabelecimento.Estabelecimento;
+import br.com.qrserve.domain.exception.BusinessException;
+import br.com.qrserve.domain.menu.Menu;
 import br.com.qrserve.domain.menu.MenuItem;
+import br.com.qrserve.domain.menu.MenuSecao;
+import br.com.qrserve.domain.menu.StatusMenuItem;
+import br.com.qrserve.domain.mesa.Mesa;
 import br.com.qrserve.domain.pedido.Pedido;
 import br.com.qrserve.domain.pedido.StatusPedido;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
@@ -23,6 +29,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -43,6 +50,8 @@ class CriarPedidoUseCaseTest {
 
     private static final LocalDateTime DATA_HORA_ATUAL = LocalDateTime.of(2026, 9, 1, 12, 34, 50);
     private static final int MENU_ITEM_ID = 1;
+    private static final int ESTABELECIMENTO_ID = 1;
+    private static final int OUTRO_ESTABELECIMENTO_ID = 2;
     private static final BigDecimal PRECO_MENU_ITEM = new BigDecimal("29.90");
 
     @Mock
@@ -106,9 +115,46 @@ class CriarPedidoUseCaseTest {
         deveRejeitarCriacaoDoPedido();
     }
 
+    @Test
+    @DisplayName("Quando a sessão do usuário estiver encerrada, rejeitar a criação do pedido")
+    void cenario_4() {
+        dadoParticipanteSessao();
+        dadoMenuItem();
+        dadoSessaoEncerrada();
+        quandoCriarPedido();
+        deveRejeitarCriacaoDoPedido();
+    }
+
+    @Test
+    @DisplayName("Quando o item do menu for de outro estabelecimento, rejeitar a criação do pedido")
+    void cenario_5() {
+        dadoParticipanteSessao();
+        dadoMenuItemDeOutroEstabelecimento();
+        quandoCriarPedido();
+        deveRejeitarCriacaoDoPedido();
+    }
+
+    @Test
+    @DisplayName("Quando o item do menu estiver indisponível, rejeitar a criação do pedido")
+    void cenario_6() {
+        dadoParticipanteSessao();
+        dadoMenuItemIndisponivel();
+        quandoCriarPedido();
+        deveRejeitarCriacaoDoPedido();
+    }
+
     private void dadoParticipanteSessao() {
+        dadoParticipanteSessaoDoEstabelecimento(ESTABELECIMENTO_ID);
+    }
+
+    private void dadoParticipanteSessaoDoEstabelecimento(int estabelecimentoId) {
+        SessaoMesa sessao = new SessaoMesa(1);
+        Mesa mesa = new Mesa(1);
+        mesa.setEstabelecimento(dadoEstabelecimento(estabelecimentoId));
+        sessao.setMesa(mesa);
+
         participanteSessao = new ParticipanteSessao(
-                new SessaoMesa(1),
+                sessao,
                 TokenUsuario.create(),
                 "Guilherme"
         );
@@ -120,12 +166,50 @@ class CriarPedidoUseCaseTest {
                 .thenReturn(Optional.of(participanteSessao));
     }
 
+    private void dadoSessaoEncerrada() {
+        participanteSessao.getSessao().setDataHoraEncerramento(DATA_HORA_ATUAL);
+
+        mensagemEsperadaException = "A sessão da mesa foi encerrada, não é possível realizar pedidos";
+        tipoEsperadoException = BusinessException.class;
+    }
+
     private void dadoMenuItem() {
+        dadoMenuItem(ESTABELECIMENTO_ID, StatusMenuItem.DISPONIVEL);
+    }
+
+    private void dadoMenuItem(int estabelecimentoId, StatusMenuItem status) {
+        Menu menu = new Menu();
+        menu.setEstabelecimento(dadoEstabelecimento(estabelecimentoId));
+        MenuSecao menuSecao = new MenuSecao();
+        menuSecao.setMenu(menu);
+
         menuItem = new MenuItem();
+        menuItem.setMenuSecao(menuSecao);
         menuItem.setPreco(PRECO_MENU_ITEM);
+        menuItem.setStatus(status);
 
         when(menuItemRepository.findById(MENU_ITEM_ID))
                 .thenReturn(Optional.of(menuItem));
+    }
+
+    private void dadoMenuItemDeOutroEstabelecimento() {
+        dadoMenuItem(OUTRO_ESTABELECIMENTO_ID, StatusMenuItem.DISPONIVEL);
+
+        mensagemEsperadaException = "Não foi encontrado o item do menu para realizar o pedido, tente novamente";
+        tipoEsperadoException = MenuItemNaoEncontradoException.class;
+    }
+
+    private void dadoMenuItemIndisponivel() {
+        dadoMenuItem(ESTABELECIMENTO_ID, StatusMenuItem.INDISPONIVEL);
+
+        mensagemEsperadaException = "O item do menu está indisponível no momento";
+        tipoEsperadoException = BusinessException.class;
+    }
+
+    private Estabelecimento dadoEstabelecimento(int id) {
+        Estabelecimento estabelecimento = new Estabelecimento();
+        ReflectionTestUtils.setField(estabelecimento, "id", id);
+        return estabelecimento;
     }
 
     private void dadoParticipanteSessaoInexistente() {

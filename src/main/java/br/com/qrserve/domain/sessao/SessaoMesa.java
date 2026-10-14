@@ -2,6 +2,7 @@ package br.com.qrserve.domain.sessao;
 
 import java.time.LocalDateTime;
 
+import br.com.qrserve.domain.estabelecimento.Estabelecimento;
 import br.com.qrserve.domain.mesa.Mesa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -93,6 +94,14 @@ public class SessaoMesa {
 
     public void setDataHoraEncerramento(LocalDateTime dataHoraEncerramento) {
         this.dataHoraEncerramento = dataHoraEncerramento;
+    }
+
+    public boolean isEncerrada() {
+        return dataHoraEncerramento != null;
+    }
+
+    public Estabelecimento getEstabelecimento() {
+        return mesa.getEstabelecimento();
     }
 
     public boolean isPermitidoEntrarNaSessao(LocalDateTime dataHoraAtual) {
