@@ -30,13 +30,13 @@ public class SessaoMesaController {
     @PostMapping("/acessar")
     public AcessarSessaoMesaResponse acessar(@Valid @RequestBody AcessarSessaoMesaForm form) {
         LOGGER.info("[POST]/sessao/acessar: {}", form.toString());
-        return acessarSessaoUseCase.execute(form);
+        return AcessarSessaoMesaResponse.from(acessarSessaoUseCase.execute(form.toCommand()));
     }
 
     @PatchMapping("/solicitacao")
     public void responderSolicitacaoEntradaSessao(@Valid @RequestBody ResponderSolicitacaoEntradaSessaoForm form) {
         LOGGER.info("[PUT]/sessao/solicitacao: {}", form.toString());
-        responderSolicitacaoEntradaSessaoUseCase.execute(form);
+        responderSolicitacaoEntradaSessaoUseCase.execute(form.toCommand());
     }
 
 }

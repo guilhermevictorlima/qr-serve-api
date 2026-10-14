@@ -8,9 +8,6 @@ import br.com.qrserve.domain.sessao.TokenUsuario;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SessaoMesaRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SolicitacaoEntradaSessaoRepository;
-import br.com.qrserve.presentation.sessao.form.AcessarSessaoMesaForm;
-import br.com.qrserve.presentation.sessao.response.AcessarSessaoMesaResponse;
-import br.com.qrserve.presentation.sessao.response.AcessarSessaoMesaResponseStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -31,26 +28,26 @@ public class AcessarSessaoUseCase {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public AcessarSessaoMesaResponse execute(AcessarSessaoMesaForm form) {
+    public AcessarSessaoResult execute(AcessarSessaoCommand command) {
         TokenUsuario token = TokenUsuario.create();
 
-        SessaoMesa sessao = repository.obterSessaoAtiva(form.mesaId())
-                .orElseGet(() -> repository.save(SessaoMesa.create(form.mesaId(), timeProvider.dataHoraAtual())));
+        SessaoMesa sessao = repository.obterSessaoAtiva(command.mesaId())
+                .orElseGet(() -> repository.save(SessaoMesa.create(command.mesaId(), timeProvider.dataHoraAtual())));
 
-        AcessarSessaoMesaResponseStatus responseStatus = tentarEntrarNaSessao(sessao, token, form.nome());
+        StatusAcessoSessao responseStatus = tentarEntrarNaSessao(sessao, token, command.nome());
 
-        return new AcessarSessaoMesaResponse(token.getValor(), sessao.getId(), responseStatus);
+        return new AcessarSessaoResult(token.getValor(), sessao.getId(), responseStatus);
     }
 
-    private AcessarSessaoMesaResponseStatus tentarEntrarNaSessao(SessaoMesa sessao, TokenUsuario tokenUsuario, String nomeUsuario) {
+    private StatusAcessoSessao tentarEntrarNaSessao(SessaoMesa sessao, TokenUsuario tokenUsuario, String nomeUsuario) {
         LocalDateTime dataHoraAtual = timeProvider.dataHoraAtual();
 
         if (sessao.isPermitidoEntrarNaSessao(dataHoraAtual)) {
             participanteSessaoRepository.save(new ParticipanteSessao(sessao, tokenUsuario, nomeUsuario));
-            return AcessarSessaoMesaResponseStatus.ACESSO_LIBERADO;
+            return StatusAcessoSessao.ACESSO_LIBERADO;
         }
 
         solicitacaoEntradaSessaoRepository.save(new SolicitacaoEntradaSessao(sessao, tokenUsuario, nomeUsuario, dataHoraAtual));
-        return AcessarSessaoMesaResponseStatus.PERMISSAO_REQUERIDA;
+        return StatusAcessoSessao.PERMISSAO_REQUERIDA;
     }
 }

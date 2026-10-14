@@ -31,7 +31,7 @@ public class PedidoController {
 
     @PostMapping
     public CriarPedidoResponse realizarPedido(@Valid @RequestBody CriarPedidoForm form) {
-        return criarPedidoUseCase.execute(form);
+        return CriarPedidoResponse.from(criarPedidoUseCase.execute(form.toCommand()));
     }
 
     @PatchMapping("/{id}/cancelar")

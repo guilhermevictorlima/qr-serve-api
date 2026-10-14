@@ -1,5 +1,6 @@
 package br.com.qrserve.presentation.pedido.form;
 
+import br.com.qrserve.application.pedido.CriarPedidoCommand;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,4 +17,9 @@ public record CriarPedidoForm(
         @Min(value = 1, message = "A quantidade de itens deve ser maior que zero para criar pedido")
         Integer quantidade
 ) {
+
+    public CriarPedidoCommand toCommand() {
+        return new CriarPedidoCommand(tokenUsuario, menuItemId, quantidade);
+    }
+
 }

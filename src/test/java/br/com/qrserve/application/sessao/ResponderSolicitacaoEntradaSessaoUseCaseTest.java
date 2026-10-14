@@ -8,8 +8,6 @@ import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
 import br.com.qrserve.domain.sessao.TokenUsuario;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SolicitacaoEntradaSessaoRepository;
-import br.com.qrserve.presentation.sessao.form.ResponderSolicitacaoEntradaSessaoForm;
-import br.com.qrserve.presentation.sessao.form.RespostaSolicitacaoEntradaSessao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,7 +49,7 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
     private String tokenSolicitante;
     private String tokenRespondente;
 
-    private ResponderSolicitacaoEntradaSessaoForm form;
+    private ResponderSolicitacaoEntradaSessaoCommand command;
     private SolicitacaoEntradaSessao solicitacao;
     private ParticipanteSessao participanteRespondente;
     private Exception exception;
@@ -140,18 +138,18 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
     }
 
     private void dadoRespostaAprovada() {
-        form = new ResponderSolicitacaoEntradaSessaoForm(
+        command = new ResponderSolicitacaoEntradaSessaoCommand(
                 tokenSolicitante,
                 tokenRespondente,
-                RespostaSolicitacaoEntradaSessao.SOLICITACAO_APROVADA
+                RespostaSolicitacao.APROVADA
         );
     }
 
     private void dadoRespostaRecusada() {
-        form = new ResponderSolicitacaoEntradaSessaoForm(
+        command = new ResponderSolicitacaoEntradaSessaoCommand(
                 tokenSolicitante,
                 tokenRespondente,
-                RespostaSolicitacaoEntradaSessao.SOLICITACAO_NEGADA
+                RespostaSolicitacao.NEGADA
         );
     }
 
@@ -187,7 +185,7 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
 
     private void quandoResponderSolicitacao() {
         try {
-            useCase.execute(form);
+            useCase.execute(command);
         } catch (Exception e) {
             exception = e;
         }

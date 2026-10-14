@@ -12,8 +12,6 @@ import br.com.qrserve.domain.sessao.SessaoMesa;
 import br.com.qrserve.infrastructure.persistence.menu.MenuItemRepository;
 import br.com.qrserve.infrastructure.persistence.pedido.PedidoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
-import br.com.qrserve.presentation.pedido.form.CriarPedidoForm;
-import br.com.qrserve.presentation.pedido.response.CriarPedidoResponse;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,20 +36,20 @@ public class CriarPedidoUseCase {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public CriarPedidoResponse execute(CriarPedidoForm form) {
-        ParticipanteSessao participanteSessao = obterParticipanteSessao(form);
-        MenuItem menuItem = obterMenuItem(form);
+    public CriarPedidoResult execute(CriarPedidoCommand command) {
+        ParticipanteSessao participanteSessao = obterParticipanteSessao(command);
+        MenuItem menuItem = obterMenuItem(command);
         validarPedidoPermitido(participanteSessao, menuItem);
 
         Pedido pedido = new Pedido();
         pedido.setParticipanteSessaoId(participanteSessao);
         pedido.setMenuItemId(menuItem);
         pedido.setValorUnitario(menuItem.getPreco());
-        pedido.setQuantidade(form.quantidade());
+        pedido.setQuantidade(command.quantidade());
         pedido.setStatus(StatusPedido.PEDIDO_REALIZADO);
         pedido.setDataHoraPedido(timeProvider.dataHoraAtual());
 
-        return CriarPedidoResponse.from(pedidoRepository.save(pedido));
+        return CriarPedidoResult.from(pedidoRepository.save(pedido));
     }
 
     private void validarPedidoPermitido(ParticipanteSessao participanteSessao, MenuItem menuItem) {
@@ -73,19 +71,19 @@ public class CriarPedidoUseCase {
         }
     }
 
-    private MenuItem obterMenuItem(CriarPedidoForm form) {
-        return menuItemRepository.findById(form.menuItemId())
+    private MenuItem obterMenuItem(CriarPedidoCommand command) {
+        return menuItemRepository.findById(command.menuItemId())
                 .orElseThrow(() -> {
-                    LOGGER.error("Item do menu não encontrado -- {}", form);
+                    LOGGER.error("Item do menu não encontrado -- {}", command);
                     return new MenuItemNaoEncontradoException("Não foi encontrado o item do menu para realizar o pedido, tente novamente");
                 });
     }
 
-    private ParticipanteSessao obterParticipanteSessao(CriarPedidoForm form) {
+    private ParticipanteSessao obterParticipanteSessao(CriarPedidoCommand command) {
         return participanteSessaoRepository
-                .obterParticipantePorToken(form.tokenUsuario())
+                .obterParticipantePorToken(command.tokenUsuario())
                 .orElseThrow(() -> {
-                    LOGGER.error("Usuário não encontrado -- {}", form);
+                    LOGGER.error("Usuário não encontrado -- {}", command);
                     return new ParticipanteSessaoNaoEncontradoException("Usuário não reconhecido, por favor tente novamente");
                 });
     }

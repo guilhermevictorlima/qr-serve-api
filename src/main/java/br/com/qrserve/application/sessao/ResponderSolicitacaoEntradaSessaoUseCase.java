@@ -6,7 +6,6 @@ import br.com.qrserve.domain.sessao.ParticipanteSessao;
 import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SolicitacaoEntradaSessaoRepository;
-import br.com.qrserve.presentation.sessao.form.ResponderSolicitacaoEntradaSessaoForm;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +28,12 @@ public class ResponderSolicitacaoEntradaSessaoUseCase {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public void execute(ResponderSolicitacaoEntradaSessaoForm form) {
-        SolicitacaoEntradaSessao solicitacao = obterSolicitacao(form);
-        ParticipanteSessao participanteRespondente = obterParticipanteRespondente(form);
+    public void execute(ResponderSolicitacaoEntradaSessaoCommand command) {
+        SolicitacaoEntradaSessao solicitacao = obterSolicitacao(command);
+        ParticipanteSessao participanteRespondente = obterParticipanteRespondente(command);
         validarRespondentePertenceASessao(solicitacao, participanteRespondente);
 
-        if (form.resposta().isSolicitacaoAprovada()) {
+        if (command.resposta().isAprovada()) {
             participanteSessaoRepository.save(ParticipanteSessao.from(solicitacao));
         } else {
             feedbackSender.notificar();
@@ -43,11 +42,11 @@ public class ResponderSolicitacaoEntradaSessaoUseCase {
         solicitacaoEntradaSessaoRepository.delete(solicitacao);
     }
 
-    private SolicitacaoEntradaSessao obterSolicitacao(ResponderSolicitacaoEntradaSessaoForm form) {
+    private SolicitacaoEntradaSessao obterSolicitacao(ResponderSolicitacaoEntradaSessaoCommand command) {
         return solicitacaoEntradaSessaoRepository
-                .obterSolicitacaoPorToken(form.tokenUsuarioSolicitante())
+                .obterSolicitacaoPorToken(command.tokenUsuarioSolicitante())
                 .orElseThrow(() -> {
-                    LOGGER.error("SOLICITAÇÃO NÃO ENCONTRADA -- {}", form);
+                    LOGGER.error("SOLICITAÇÃO NÃO ENCONTRADA -- {}", command);
                     return new SolicitacaoEntradaSessaoNaoEncontradaException("Solicitação de entrada não encontrada. Verifique se já foi respondida e tente novamente");
                 });
     }
@@ -59,10 +58,10 @@ public class ResponderSolicitacaoEntradaSessaoUseCase {
         }
     }
 
-    private ParticipanteSessao obterParticipanteRespondente(ResponderSolicitacaoEntradaSessaoForm form) {
-        return participanteSessaoRepository.obterParticipantePorToken(form.tokenUsuarioRespondente())
+    private ParticipanteSessao obterParticipanteRespondente(ResponderSolicitacaoEntradaSessaoCommand command) {
+        return participanteSessaoRepository.obterParticipantePorToken(command.tokenUsuarioRespondente())
                 .orElseThrow(() -> {
-                    LOGGER.error("PARTICIPANTE NÃO ENCONTRADO -- {}", form);
+                    LOGGER.error("PARTICIPANTE NÃO ENCONTRADO -- {}", command);
                     return new ParticipanteSessaoNaoEncontradoException("Participante respondente não encontrado, token identificador inválido");
                 });
     }

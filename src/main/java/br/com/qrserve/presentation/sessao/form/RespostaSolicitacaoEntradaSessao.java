@@ -1,10 +1,19 @@
 package br.com.qrserve.presentation.sessao.form;
 
-public enum RespostaSolicitacaoEntradaSessao {
-    SOLICITACAO_APROVADA,
-    SOLICITACAO_NEGADA;
+import br.com.qrserve.application.sessao.RespostaSolicitacao;
 
-    public boolean isSolicitacaoAprovada() {
-        return this == SOLICITACAO_APROVADA;
+public enum RespostaSolicitacaoEntradaSessao {
+    SOLICITACAO_APROVADA(RespostaSolicitacao.APROVADA),
+    SOLICITACAO_NEGADA(RespostaSolicitacao.NEGADA);
+
+    private final RespostaSolicitacao respostaSolicitacao;
+
+    RespostaSolicitacaoEntradaSessao(RespostaSolicitacao respostaSolicitacao) {
+        this.respostaSolicitacao = respostaSolicitacao;
     }
+
+    public RespostaSolicitacao toRespostaSolicitacao() {
+        return respostaSolicitacao;
+    }
+
 }

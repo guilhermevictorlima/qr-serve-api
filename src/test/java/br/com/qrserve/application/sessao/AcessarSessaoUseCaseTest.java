@@ -7,9 +7,6 @@ import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SessaoMesaRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SolicitacaoEntradaSessaoRepository;
-import br.com.qrserve.presentation.sessao.form.AcessarSessaoMesaForm;
-import br.com.qrserve.presentation.sessao.response.AcessarSessaoMesaResponse;
-import br.com.qrserve.presentation.sessao.response.AcessarSessaoMesaResponseStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,13 +50,13 @@ class AcessarSessaoUseCaseTest {
     @InjectMocks
     private AcessarSessaoUseCase useCase;
 
-    private AcessarSessaoMesaForm form;
+    private AcessarSessaoCommand command;
     private SessaoMesa sessao;
-    private AcessarSessaoMesaResponse response;
+    private AcessarSessaoResult response;
 
     @BeforeEach
     void setUp() {
-        form = new AcessarSessaoMesaForm(
+        command = new AcessarSessaoCommand(
                 1,
                 "Guilherme"
         );
@@ -101,7 +98,7 @@ class AcessarSessaoUseCaseTest {
     }
 
     private void dadoSessaoInexistente() {
-        when(repository.obterSessaoAtiva(form.mesaId()))
+        when(repository.obterSessaoAtiva(command.mesaId()))
                 .thenReturn(Optional.empty());
 
         when(repository.save(any(SessaoMesa.class)))
@@ -110,11 +107,11 @@ class AcessarSessaoUseCaseTest {
 
     private void dadoSessaoAtiva() {
         sessao = SessaoMesa.create(
-                form.mesaId(),
+                command.mesaId(),
                 DATA_HORA_ATUAL
         );
 
-        when(repository.obterSessaoAtiva(form.mesaId()))
+        when(repository.obterSessaoAtiva(command.mesaId()))
                 .thenReturn(Optional.of(sessao));
     }
 
@@ -127,7 +124,7 @@ class AcessarSessaoUseCaseTest {
     }
 
     private void quandoAcessar() {
-        response = useCase.execute(form);
+        response = useCase.execute(command);
     }
 
     private void deveCriarSessao() {
@@ -144,7 +141,7 @@ class AcessarSessaoUseCaseTest {
     }
 
     private void deveRetornarAcessoLiberado() {
-        assertEquals(AcessarSessaoMesaResponseStatus.ACESSO_LIBERADO, response.responseStatus());
+        assertEquals(StatusAcessoSessao.ACESSO_LIBERADO, response.status());
     }
 
     private void deveRegistrarSolicitacaoEntrada() {
@@ -156,7 +153,7 @@ class AcessarSessaoUseCaseTest {
     }
 
     private void deveRetornarPermissaoRequerida() {
-        assertEquals(AcessarSessaoMesaResponseStatus.PERMISSAO_REQUERIDA, response.responseStatus());
+        assertEquals(StatusAcessoSessao.PERMISSAO_REQUERIDA, response.status());
     }
 
     private void naoDeveCriarNovaSessao() {

@@ -18,8 +18,6 @@ import br.com.qrserve.domain.sessao.TokenUsuario;
 import br.com.qrserve.infrastructure.persistence.menu.MenuItemRepository;
 import br.com.qrserve.infrastructure.persistence.pedido.PedidoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
-import br.com.qrserve.presentation.pedido.form.CriarPedidoForm;
-import br.com.qrserve.presentation.pedido.response.CriarPedidoResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -73,11 +71,11 @@ class CriarPedidoUseCaseTest {
     private CriarPedidoUseCase useCase;
 
     private String tokenUsuario;
-    private CriarPedidoForm form;
+    private CriarPedidoCommand command;
     private ParticipanteSessao participanteSessao;
     private MenuItem menuItem;
     private Pedido pedido;
-    private CriarPedidoResponse response;
+    private CriarPedidoResult response;
     private Exception exception;
     private Class<? extends Exception> tipoEsperadoException;
     private String mensagemEsperadaException;
@@ -231,8 +229,8 @@ class CriarPedidoUseCaseTest {
 
     private void quandoCriarPedido() {
         try {
-            form = new CriarPedidoForm(tokenUsuario, MENU_ITEM_ID, 2);
-            response = useCase.execute(form);
+            command = new CriarPedidoCommand(tokenUsuario, MENU_ITEM_ID, 2);
+            response = useCase.execute(command);
         } catch (Exception e) {
             exception = e;
         }
@@ -249,7 +247,7 @@ class CriarPedidoUseCaseTest {
         assertEquals(participanteSessao.getId(), pedido.getParticipanteSessao().getId());
         assertEquals(menuItem.getId(), pedido.getMenuItem().getId());
         assertEquals(PRECO_MENU_ITEM, pedido.getValorUnitario());
-        assertEquals(form.quantidade(), pedido.getQuantidade());
+        assertEquals(command.quantidade(), pedido.getQuantidade());
         assertEquals(StatusPedido.PEDIDO_REALIZADO, pedido.getStatus());
         assertEquals(DATA_HORA_ATUAL, pedido.getDataHoraPedido());
     }

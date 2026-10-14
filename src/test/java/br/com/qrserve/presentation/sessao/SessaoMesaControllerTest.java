@@ -7,8 +7,11 @@ import br.com.qrserve.domain.exception.SolicitacaoEntradaSessaoNaoEncontradaExce
 import br.com.qrserve.presentation.sessao.form.AcessarSessaoMesaForm;
 import br.com.qrserve.presentation.sessao.form.RespostaSolicitacaoEntradaSessao;
 import br.com.qrserve.presentation.sessao.form.ResponderSolicitacaoEntradaSessaoForm;
-import br.com.qrserve.presentation.sessao.response.AcessarSessaoMesaResponse;
-import br.com.qrserve.presentation.sessao.response.AcessarSessaoMesaResponseStatus;
+import br.com.qrserve.application.sessao.AcessarSessaoCommand;
+import br.com.qrserve.application.sessao.AcessarSessaoResult;
+import br.com.qrserve.application.sessao.ResponderSolicitacaoEntradaSessaoCommand;
+import br.com.qrserve.application.sessao.RespostaSolicitacao;
+import br.com.qrserve.application.sessao.StatusAcessoSessao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +57,7 @@ class SessaoMesaControllerTest {
 
         quandoAcessarSessao(form);
 
-        verify(acessarSessaoUseCase).execute(any(AcessarSessaoMesaForm.class));
+        verify(acessarSessaoUseCase).execute(new AcessarSessaoCommand(1, "Maria"));
     }
 
     @Test
@@ -150,7 +153,8 @@ class SessaoMesaControllerTest {
         quandoResponderSolicitacao(form)
                 .andExpect(status().isOk());
 
-        verify(responderSolicitacaoEntradaSessaoUseCase).execute(any(ResponderSolicitacaoEntradaSessaoForm.class));
+        verify(responderSolicitacaoEntradaSessaoUseCase).execute(
+                new ResponderSolicitacaoEntradaSessaoCommand("token-solicitante", "token-respondente", RespostaSolicitacao.APROVADA));
     }
 
     @Test
@@ -297,12 +301,12 @@ class SessaoMesaControllerTest {
     }
 
     private void dadoAcessoLiberadoPeloUseCase() {
-        when(acessarSessaoUseCase.execute(any(AcessarSessaoMesaForm.class)))
-                .thenReturn(new AcessarSessaoMesaResponse("token-usuario", 5, AcessarSessaoMesaResponseStatus.ACESSO_LIBERADO));
+        when(acessarSessaoUseCase.execute(any(AcessarSessaoCommand.class)))
+                .thenReturn(new AcessarSessaoResult("token-usuario", 5, StatusAcessoSessao.ACESSO_LIBERADO));
     }
 
     private void dadoUseCaseDeAcessarLancando(RuntimeException exception) {
-        when(acessarSessaoUseCase.execute(any(AcessarSessaoMesaForm.class))).thenThrow(exception);
+        when(acessarSessaoUseCase.execute(any(AcessarSessaoCommand.class))).thenThrow(exception);
     }
 
     private void dadoUseCaseDeResponderLancando(RuntimeException exception) {

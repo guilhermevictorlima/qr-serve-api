@@ -1,6 +1,6 @@
 package br.com.qrserve.presentation.pedido.response;
 
-import br.com.qrserve.domain.pedido.Pedido;
+import br.com.qrserve.application.pedido.CriarPedidoResult;
 
 import java.math.BigDecimal;
 
@@ -12,13 +12,13 @@ public record CriarPedidoResponse(
         Integer quantidade
 ) {
 
-    public static CriarPedidoResponse from(Pedido pedido) {
+    public static CriarPedidoResponse from(CriarPedidoResult result) {
         return new CriarPedidoResponse(
-                pedido.getId(),
-                pedido.getParticipanteSessao().getNome(),
-                pedido.getMenuItem().getDescricao(),
-                pedido.getValorUnitario(),
-                pedido.getQuantidade()
+                result.id(),
+                result.nomeParticipanteSessao(),
+                result.descricaoMenuItem(),
+                result.valorUnitario(),
+                result.quantidade()
         );
     }
 

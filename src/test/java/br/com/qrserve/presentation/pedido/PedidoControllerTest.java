@@ -8,7 +8,8 @@ import br.com.qrserve.domain.exception.MenuItemNaoEncontradoException;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.exception.PedidoNaoEncontradoException;
 import br.com.qrserve.presentation.pedido.form.CriarPedidoForm;
-import br.com.qrserve.presentation.pedido.response.CriarPedidoResponse;
+import br.com.qrserve.application.pedido.CriarPedidoCommand;
+import br.com.qrserve.application.pedido.CriarPedidoResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ class PedidoControllerTest {
 
         quandoRealizarPedido(form);
 
-        verify(criarPedidoUseCase).execute(any(CriarPedidoForm.class));
+        verify(criarPedidoUseCase).execute(new CriarPedidoCommand("token-valido", 1, 2));
     }
 
     @Test
@@ -332,12 +333,12 @@ class PedidoControllerTest {
     }
 
     private void dadoPedidoCriadoPeloUseCase() {
-        when(criarPedidoUseCase.execute(any(CriarPedidoForm.class)))
-                .thenReturn(new CriarPedidoResponse(10, "Maria", "Pizza", new BigDecimal("25.90"), 2));
+        when(criarPedidoUseCase.execute(any(CriarPedidoCommand.class)))
+                .thenReturn(new CriarPedidoResult(10, "Maria", "Pizza", new BigDecimal("25.90"), 2));
     }
 
     private void dadoUseCaseDeCriarLancando(RuntimeException exception) {
-        when(criarPedidoUseCase.execute(any(CriarPedidoForm.class))).thenThrow(exception);
+        when(criarPedidoUseCase.execute(any(CriarPedidoCommand.class))).thenThrow(exception);
     }
 
     private void dadoUseCaseDeCancelarLancando(RuntimeException exception) {
