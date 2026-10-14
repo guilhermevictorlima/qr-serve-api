@@ -65,7 +65,7 @@ class PedidoControllerTest {
     @Test
     @DisplayName("Dado token de usuário nulo, quando realizar pedido, deve retornar erro de validação")
     void dadoTokenUsuarioNuloQuandoRealizarPedidoDeveRetornarErroDeValidacao() throws Exception {
-        var form = dadoFormularioValido(null, 1, new BigDecimal("25.90"), 2);
+        var form = dadoFormularioValido(null, 1, 2);
 
         quandoRealizarPedido(form)
                 .andExpect(status().isBadRequest())
@@ -78,7 +78,7 @@ class PedidoControllerTest {
     @Test
     @DisplayName("Dado token de usuário vazio, quando realizar pedido, deve retornar erro de validação")
     void dadoTokenUsuarioVazioQuandoRealizarPedidoDeveRetornarErroDeValidacao() throws Exception {
-        var form = dadoFormularioValido("", 1, new BigDecimal("25.90"), 2);
+        var form = dadoFormularioValido("", 1, 2);
 
         quandoRealizarPedido(form)
                 .andExpect(status().isBadRequest())
@@ -91,7 +91,7 @@ class PedidoControllerTest {
     @Test
     @DisplayName("Dado identificador do item de menu nulo, quando realizar pedido, deve retornar erro de validação")
     void dadoMenuItemIdNuloQuandoRealizarPedidoDeveRetornarErroDeValidacao() throws Exception {
-        var form = dadoFormularioValido("token-valido", null, new BigDecimal("25.90"), 2);
+        var form = dadoFormularioValido("token-valido", null, 2);
 
         quandoRealizarPedido(form)
                 .andExpect(status().isBadRequest())
@@ -102,48 +102,9 @@ class PedidoControllerTest {
     }
 
     @Test
-    @DisplayName("Dado valor unitário nulo, quando realizar pedido, deve retornar erro de validação")
-    void dadoValorUnitarioNuloQuandoRealizarPedidoDeveRetornarErroDeValidacao() throws Exception {
-        var form = dadoFormularioValido("token-valido", 1, null, 2);
-
-        quandoRealizarPedido(form)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.valorUnitario")
-                        .value("O valor unitário é obrigatório para criar pedido"));
-
-        deveNaoCriarPedido();
-    }
-
-    @Test
-    @DisplayName("Dado valor unitário igual a zero, quando realizar pedido, deve retornar erro de validação")
-    void dadoValorUnitarioIgualAZeroQuandoRealizarPedidoDeveRetornarErroDeValidacao() throws Exception {
-        var form = dadoFormularioValido("token-valido", 1, BigDecimal.ZERO, 2);
-
-        quandoRealizarPedido(form)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.valorUnitario")
-                        .value("O valor unitário deve ser maior que zero para criar pedido"));
-
-        deveNaoCriarPedido();
-    }
-
-    @Test
-    @DisplayName("Dado valor unitário negativo, quando realizar pedido, deve retornar erro de validação")
-    void dadoValorUnitarioNegativoQuandoRealizarPedidoDeveRetornarErroDeValidacao() throws Exception {
-        var form = dadoFormularioValido("token-valido", 1, new BigDecimal("-1.00"), 2);
-
-        quandoRealizarPedido(form)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.valorUnitario")
-                        .value("O valor unitário deve ser maior que zero para criar pedido"));
-
-        deveNaoCriarPedido();
-    }
-
-    @Test
     @DisplayName("Dado quantidade nula, quando realizar pedido, deve retornar erro de validação")
     void dadoQuantidadeNulaQuandoRealizarPedidoDeveRetornarErroDeValidacao() throws Exception {
-        var form = dadoFormularioValido("token-valido", 1, new BigDecimal("25.90"), null);
+        var form = dadoFormularioValido("token-valido", 1, null);
 
         quandoRealizarPedido(form)
                 .andExpect(status().isBadRequest())
@@ -156,7 +117,7 @@ class PedidoControllerTest {
     @Test
     @DisplayName("Dado quantidade igual a zero, quando realizar pedido, deve retornar erro de validação")
     void dadoQuantidadeIgualAZeroQuandoRealizarPedidoDeveRetornarErroDeValidacao() throws Exception {
-        var form = dadoFormularioValido("token-valido", 1, new BigDecimal("25.90"), 0);
+        var form = dadoFormularioValido("token-valido", 1, 0);
 
         quandoRealizarPedido(form)
                 .andExpect(status().isBadRequest())
@@ -323,7 +284,6 @@ class PedidoControllerTest {
         return dadoFormularioValido(
                 "token-valido",
                 1,
-                new BigDecimal("25.90"),
                 2
         );
     }
@@ -331,13 +291,11 @@ class PedidoControllerTest {
     private CriarPedidoForm dadoFormularioValido(
             String tokenUsuario,
             Integer menuItemId,
-            BigDecimal valorUnitario,
             Integer quantidade
     ) {
         return new CriarPedidoForm(
                 tokenUsuario,
                 menuItemId,
-                valorUnitario,
                 quantidade
         );
     }

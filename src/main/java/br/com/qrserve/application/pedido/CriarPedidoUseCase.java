@@ -42,7 +42,7 @@ public class CriarPedidoUseCase {
         Pedido pedido = new Pedido();
         pedido.setParticipanteSessaoId(participanteSessao);
         pedido.setMenuItemId(menuItem);
-        pedido.setValorUnitario(form.valorUnitario());
+        pedido.setValorUnitario(menuItem.getPreco());
         pedido.setQuantidade(form.quantidade());
         pedido.setStatus(StatusPedido.PEDIDO_REALIZADO);
         pedido.setDataHoraPedido(timeProvider.dataHoraAtual());

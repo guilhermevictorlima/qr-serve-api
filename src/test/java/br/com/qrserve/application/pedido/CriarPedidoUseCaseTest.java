@@ -43,6 +43,7 @@ class CriarPedidoUseCaseTest {
 
     private static final LocalDateTime DATA_HORA_ATUAL = LocalDateTime.of(2026, 9, 1, 12, 34, 50);
     private static final int MENU_ITEM_ID = 1;
+    private static final BigDecimal PRECO_MENU_ITEM = new BigDecimal("29.90");
 
     @Mock
     private ParticipanteSessaoRepository participanteSessaoRepository;
@@ -121,6 +122,7 @@ class CriarPedidoUseCaseTest {
 
     private void dadoMenuItem() {
         menuItem = new MenuItem();
+        menuItem.setPreco(PRECO_MENU_ITEM);
 
         when(menuItemRepository.findById(MENU_ITEM_ID))
                 .thenReturn(Optional.of(menuItem));
@@ -145,7 +147,7 @@ class CriarPedidoUseCaseTest {
 
     private void quandoCriarPedido() {
         try {
-            form = new CriarPedidoForm(tokenUsuario, MENU_ITEM_ID, BigDecimal.valueOf(29.90), 2);
+            form = new CriarPedidoForm(tokenUsuario, MENU_ITEM_ID, 2);
             response = useCase.execute(form);
         } catch (Exception e) {
             exception = e;
@@ -162,7 +164,7 @@ class CriarPedidoUseCaseTest {
 
         assertEquals(participanteSessao.getId(), pedido.getParticipanteSessao().getId());
         assertEquals(menuItem.getId(), pedido.getMenuItem().getId());
-        assertEquals(form.valorUnitario(), pedido.getValorUnitario());
+        assertEquals(PRECO_MENU_ITEM, pedido.getValorUnitario());
         assertEquals(form.quantidade(), pedido.getQuantidade());
         assertEquals(StatusPedido.PEDIDO_REALIZADO, pedido.getStatus());
         assertEquals(DATA_HORA_ATUAL, pedido.getDataHoraPedido());
