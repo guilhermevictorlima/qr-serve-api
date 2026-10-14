@@ -10,6 +10,11 @@ public record ResponderSolicitacaoEntradaSessaoForm(
     @NotNull(message = "A resposta da solicitação é obrigatória para responder a solicitação") RespostaSolicitacaoEntradaSessao resposta
 ) {
 
+    @Override
+    public String toString() {
+        return "ResponderSolicitacaoEntradaSessaoForm[resposta=" + resposta + "]";
+    }
+
     public ResponderSolicitacaoEntradaSessaoCommand toCommand() {
         return new ResponderSolicitacaoEntradaSessaoCommand(tokenUsuarioSolicitante, tokenUsuarioRespondente, resposta.toRespostaSolicitacao());
     }

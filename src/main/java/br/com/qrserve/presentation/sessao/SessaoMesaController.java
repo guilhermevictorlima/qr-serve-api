@@ -35,7 +35,7 @@ public class SessaoMesaController {
 
     @PatchMapping("/solicitacao")
     public void responderSolicitacaoEntradaSessao(@Valid @RequestBody ResponderSolicitacaoEntradaSessaoForm form) {
-        LOGGER.info("[PUT]/sessao/solicitacao: {}", form.toString());
+        LOGGER.info("[PATCH]/sessao/solicitacao: {}", form.toString());
         responderSolicitacaoEntradaSessaoUseCase.execute(form.toCommand());
     }
 

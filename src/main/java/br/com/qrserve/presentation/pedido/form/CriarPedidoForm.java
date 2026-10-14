@@ -18,6 +18,11 @@ public record CriarPedidoForm(
         Integer quantidade
 ) {
 
+    @Override
+    public String toString() {
+        return "CriarPedidoForm[menuItemId=" + menuItemId + ", quantidade=" + quantidade + "]";
+    }
+
     public CriarPedidoCommand toCommand() {
         return new CriarPedidoCommand(tokenUsuario, menuItemId, quantidade);
     }

@@ -5,4 +5,9 @@ public record CriarPedidoCommand(
         Integer menuItemId,
         Integer quantidade
 ) {
+
+    @Override
+    public String toString() {
+        return "CriarPedidoCommand[menuItemId=" + menuItemId + ", quantidade=" + quantidade + "]";
+    }
 }

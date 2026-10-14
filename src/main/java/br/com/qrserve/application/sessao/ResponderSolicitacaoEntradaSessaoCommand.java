@@ -5,4 +5,9 @@ public record ResponderSolicitacaoEntradaSessaoCommand(
         String tokenUsuarioRespondente,
         RespostaSolicitacao resposta
 ) {
+
+    @Override
+    public String toString() {
+        return "ResponderSolicitacaoEntradaSessaoCommand[resposta=" + resposta + "]";
+    }
 }
