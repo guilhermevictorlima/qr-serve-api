@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PedidoControllerTest {
 
     private static final String MENSAGEM_ERRO_INESPERADO = "Ocorreu um erro inesperado, tente novamente mais tarde";
+    private static final String TOKEN_USUARIO = "token-valido";
 
     @Autowired
     private MockMvc mockMvc;
@@ -190,7 +191,7 @@ class PedidoControllerTest {
         quandoCancelarPedido("1")
                 .andExpect(status().isOk());
 
-        verify(cancelarPedidoUseCase).execute(1);
+        verify(cancelarPedidoUseCase).execute(1, TOKEN_USUARIO);
     }
 
     @Test
@@ -219,7 +220,7 @@ class PedidoControllerTest {
         quandoCancelarPedido("abc")
                 .andExpect(status().isBadRequest());
 
-        verify(cancelarPedidoUseCase, never()).execute(any());
+        verify(cancelarPedidoUseCase, never()).execute(any(), any());
     }
 
     @Test
@@ -238,7 +239,7 @@ class PedidoControllerTest {
         quandoConcluirPedido("1")
                 .andExpect(status().isOk());
 
-        verify(concluirPedidoUseCase).execute(1);
+        verify(concluirPedidoUseCase).execute(1, TOKEN_USUARIO);
     }
 
     @Test
@@ -267,7 +268,7 @@ class PedidoControllerTest {
         quandoConcluirPedido("abc")
                 .andExpect(status().isBadRequest());
 
-        verify(concluirPedidoUseCase, never()).execute(any());
+        verify(concluirPedidoUseCase, never()).execute(any(), any());
     }
 
     @Test
@@ -278,6 +279,24 @@ class PedidoControllerTest {
         quandoConcluirPedido("1")
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().string(MENSAGEM_ERRO_INESPERADO));
+    }
+
+    @Test
+    @DisplayName("Dado token de usuário ausente, quando cancelar pedido, deve retornar requisição inválida")
+    void dadoTokenUsuarioAusenteQuandoCancelarPedidoDeveRetornarRequisicaoInvalida() throws Exception {
+        mockMvc.perform(patch("/pedido/{id}/cancelar", "1"))
+                .andExpect(status().isBadRequest());
+
+        verify(cancelarPedidoUseCase, never()).execute(any(), any());
+    }
+
+    @Test
+    @DisplayName("Dado token de usuário ausente, quando concluir pedido, deve retornar requisição inválida")
+    void dadoTokenUsuarioAusenteQuandoConcluirPedidoDeveRetornarRequisicaoInvalida() throws Exception {
+        mockMvc.perform(patch("/pedido/{id}/concluir", "1"))
+                .andExpect(status().isBadRequest());
+
+        verify(concluirPedidoUseCase, never()).execute(any(), any());
     }
 
     private CriarPedidoForm dadoFormularioValido() {
@@ -322,11 +341,11 @@ class PedidoControllerTest {
     }
 
     private void dadoUseCaseDeCancelarLancando(RuntimeException exception) {
-        doThrow(exception).when(cancelarPedidoUseCase).execute(any());
+        doThrow(exception).when(cancelarPedidoUseCase).execute(any(), any());
     }
 
     private void dadoUseCaseDeConcluirLancando(RuntimeException exception) {
-        doThrow(exception).when(concluirPedidoUseCase).execute(any());
+        doThrow(exception).when(concluirPedidoUseCase).execute(any(), any());
     }
 
     private ResultActions quandoRealizarPedidoSemCorpo() throws Exception {
@@ -334,10 +353,10 @@ class PedidoControllerTest {
     }
 
     private ResultActions quandoCancelarPedido(String id) throws Exception {
-        return mockMvc.perform(patch("/pedido/{id}/cancelar", id));
+        return mockMvc.perform(patch("/pedido/{id}/cancelar", id).header("Token-Usuario", TOKEN_USUARIO));
     }
 
     private ResultActions quandoConcluirPedido(String id) throws Exception {
-        return mockMvc.perform(patch("/pedido/{id}/concluir", id));
+        return mockMvc.perform(patch("/pedido/{id}/concluir", id).header("Token-Usuario", TOKEN_USUARIO));
     }
 }

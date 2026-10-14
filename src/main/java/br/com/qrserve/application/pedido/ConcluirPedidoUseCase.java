@@ -2,9 +2,12 @@ package br.com.qrserve.application.pedido;
 
 import br.com.qrserve.domain.exception.BusinessException;
 import br.com.qrserve.domain.exception.PedidoNaoEncontradoException;
+import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.pedido.Pedido;
 import br.com.qrserve.domain.pedido.StatusPedido;
+import br.com.qrserve.domain.sessao.ParticipanteSessao;
 import br.com.qrserve.infrastructure.persistence.pedido.PedidoRepository;
+import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,15 +18,18 @@ public class ConcluirPedidoUseCase {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConcluirPedidoUseCase.class);
 
     private final PedidoRepository pedidoRepository;
+    private final ParticipanteSessaoRepository participanteSessaoRepository;
 
-    public ConcluirPedidoUseCase(PedidoRepository pedidoRepository) {
+    public ConcluirPedidoUseCase(PedidoRepository pedidoRepository, ParticipanteSessaoRepository participanteSessaoRepository) {
         this.pedidoRepository = pedidoRepository;
+        this.participanteSessaoRepository = participanteSessaoRepository;
     }
 
-
     @Transactional(rollbackOn = Exception.class)
-    public void execute(Integer pedidoId) {
+    public void execute(Integer pedidoId, String tokenUsuario) {
+        ParticipanteSessao participante = obterParticipante(tokenUsuario);
         Pedido pedido = obterPedido(pedidoId);
+        validarPermissao(pedido, participante);
 
         if (!pedido.isPedidoEmAberto()) {
             throw new BusinessException("O pedido precisa estar em aberto para ser concluído");
@@ -32,6 +38,21 @@ public class ConcluirPedidoUseCase {
         pedido.setStatus(StatusPedido.PEDIDO_CONCLUIDO);
 
         pedidoRepository.save(pedido);
+    }
+
+    private ParticipanteSessao obterParticipante(String tokenUsuario) {
+        return participanteSessaoRepository.obterParticipantePorToken(tokenUsuario)
+                .orElseThrow(() -> {
+                    LOGGER.error("PARTICIPANTE NÃO ENCONTRADO");
+                    return new ParticipanteSessaoNaoEncontradoException("Usuário não reconhecido, por favor tente novamente");
+                });
+    }
+
+    private void validarPermissao(Pedido pedido, ParticipanteSessao participante) {
+        if (!pedido.isDaSessao(participante)) {
+            LOGGER.error("PARTICIPANTE SEM PERMISSÃO PARA O PEDIDO -- pedidoId: {}", pedido.getId());
+            throw new PedidoNaoEncontradoException("Pedido não encontrado");
+        }
     }
 
     private Pedido obterPedido(Integer pedidoId) {

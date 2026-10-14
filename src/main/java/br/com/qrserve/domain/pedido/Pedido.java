@@ -16,6 +16,7 @@ import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "pedido")
@@ -111,5 +112,13 @@ public class Pedido {
 
     public boolean isPedidoEmAberto() {
         return status == StatusPedido.PEDIDO_REALIZADO;
+    }
+
+    public boolean isDoParticipante(ParticipanteSessao participante) {
+        return participanteSessao.getToken().getValor().equals(participante.getToken().getValor());
+    }
+
+    public boolean isDaSessao(ParticipanteSessao participante) {
+        return Objects.equals(participanteSessao.getSessao().getId(), participante.getSessao().getId());
     }
 }
