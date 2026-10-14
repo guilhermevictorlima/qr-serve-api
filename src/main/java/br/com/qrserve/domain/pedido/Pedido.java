@@ -52,6 +52,9 @@ public class Pedido {
     @Column(name = "versao", nullable = false)
     private Long versao;
 
+    @Column(name = "data_hora_conclusao")
+    private LocalDateTime dataHoraConclusao;
+
     @Column(name = "data_hora_cancelamento")
     private LocalDateTime dataHoraCancelamento;
 
@@ -113,6 +116,14 @@ public class Pedido {
 
     public void setDataHoraCancelamento(LocalDateTime dataHoraCancelamento) {
         this.dataHoraCancelamento = dataHoraCancelamento;
+    }
+
+    public LocalDateTime getDataHoraConclusao() {
+        return dataHoraConclusao;
+    }
+
+    public void setDataHoraConclusao(LocalDateTime dataHoraConclusao) {
+        this.dataHoraConclusao = dataHoraConclusao;
     }
 
     public boolean isPedidoEmAberto() {

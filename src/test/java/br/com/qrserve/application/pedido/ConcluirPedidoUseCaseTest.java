@@ -1,5 +1,6 @@
 package br.com.qrserve.application.pedido;
 
+import br.com.qrserve.application.time.TimeProvider;
 import br.com.qrserve.domain.exception.EstadoInvalidoException;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.exception.PedidoNaoEncontradoException;
@@ -19,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,11 +34,16 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ConcluirPedidoUseCaseTest {
 
+    private static final LocalDateTime DATA_HORA_ATUAL = LocalDateTime.of(2026, 9, 1, 12, 34, 50);
+
     @Mock
     private PedidoRepository pedidoRepository;
 
     @Mock
     private ParticipanteSessaoRepository participanteSessaoRepository;
+
+    @Mock
+    private TimeProvider timeProvider;
 
     @Captor
     private ArgumentCaptor<Pedido> pedidoArgumentCaptor;
@@ -121,6 +128,9 @@ class ConcluirPedidoUseCaseTest {
         pedido.setParticipanteSessao(outroParticipanteDaMesmaSessao);
         pedido.setStatus(StatusPedido.PEDIDO_REALIZADO);
 
+        when(timeProvider.dataHoraAtual())
+                .thenReturn(DATA_HORA_ATUAL);
+
         when(pedidoRepository.findById(1))
                 .thenReturn(Optional.of(pedido));
     }
@@ -174,6 +184,7 @@ class ConcluirPedidoUseCaseTest {
 
         Pedido pedidoSalvo = pedidoArgumentCaptor.getValue();
         assertEquals(StatusPedido.PEDIDO_CONCLUIDO, pedidoSalvo.getStatus());
+        assertEquals(DATA_HORA_ATUAL, pedidoSalvo.getDataHoraConclusao());
     }
 
     private void deveRejeitarConclusaoDoPedido() {

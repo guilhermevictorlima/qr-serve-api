@@ -177,6 +177,7 @@ CREATE TABLE pedido (
     status                  VARCHAR(30) NOT NULL,
     data_hora_pedido        TIMESTAMP NOT NULL,
     data_hora_cancelamento  TIMESTAMP,
+    data_hora_conclusao     TIMESTAMP,
     versao                  BIGINT NOT NULL DEFAULT 0,
 
     CONSTRAINT pk_pedido PRIMARY KEY (id),

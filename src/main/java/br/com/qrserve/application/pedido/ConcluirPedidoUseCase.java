@@ -1,5 +1,6 @@
 package br.com.qrserve.application.pedido;
 
+import br.com.qrserve.application.time.TimeProvider;
 import br.com.qrserve.domain.exception.EstadoInvalidoException;
 import br.com.qrserve.domain.exception.PedidoNaoEncontradoException;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
@@ -19,10 +20,12 @@ public class ConcluirPedidoUseCase {
 
     private final PedidoRepository pedidoRepository;
     private final ParticipanteSessaoRepository participanteSessaoRepository;
+    private final TimeProvider timeProvider;
 
-    public ConcluirPedidoUseCase(PedidoRepository pedidoRepository, ParticipanteSessaoRepository participanteSessaoRepository) {
+    public ConcluirPedidoUseCase(PedidoRepository pedidoRepository, ParticipanteSessaoRepository participanteSessaoRepository, TimeProvider timeProvider) {
         this.pedidoRepository = pedidoRepository;
         this.participanteSessaoRepository = participanteSessaoRepository;
+        this.timeProvider = timeProvider;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -36,6 +39,7 @@ public class ConcluirPedidoUseCase {
         }
 
         pedido.setStatus(StatusPedido.PEDIDO_CONCLUIDO);
+        pedido.setDataHoraConclusao(timeProvider.dataHoraAtual());
 
         pedidoRepository.save(pedido);
     }
