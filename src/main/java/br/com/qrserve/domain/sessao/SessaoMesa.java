@@ -48,8 +48,8 @@ public class SessaoMesa {
         this.dataHoraInicio = dataHoraInicio;
     }
 
-    public static SessaoMesa create(Integer mesaId, LocalDateTime dataHoraAtual) {
-        return new SessaoMesa(new Mesa(mesaId), TokenSessao.create(mesaId, dataHoraAtual), dataHoraAtual);
+    public static SessaoMesa create(Mesa mesa, LocalDateTime dataHoraAtual) {
+        return new SessaoMesa(mesa, TokenSessao.create(mesa.getId(), dataHoraAtual), dataHoraAtual);
     }
 
     public SessaoMesa(Integer id) {

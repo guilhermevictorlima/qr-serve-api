@@ -1,9 +1,12 @@
 package br.com.qrserve.application.sessao;
 
 import br.com.qrserve.application.time.TimeProvider;
+import br.com.qrserve.domain.exception.MesaNaoEncontradaException;
+import br.com.qrserve.domain.mesa.Mesa;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
 import br.com.qrserve.domain.sessao.SessaoMesa;
 import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
+import br.com.qrserve.infrastructure.persistence.menu.MesaRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SessaoMesaRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SolicitacaoEntradaSessaoRepository;
@@ -23,7 +26,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,6 +39,9 @@ class AcessarSessaoUseCaseTest {
 
     @Mock
     private SessaoMesaRepository repository;
+
+    @Mock
+    private MesaRepository mesaRepository;
 
     @Mock
     private TimeProvider timeProvider;
@@ -53,6 +61,8 @@ class AcessarSessaoUseCaseTest {
     private AcessarSessaoCommand command;
     private SessaoMesa sessao;
     private AcessarSessaoResult response;
+    private Mesa mesa;
+    private Exception exception;
 
     @BeforeEach
     void setUp() {
@@ -61,12 +71,13 @@ class AcessarSessaoUseCaseTest {
                 "Guilherme"
         );
 
-        when(timeProvider.dataHoraAtual()).thenReturn(DATA_HORA_ATUAL);
+        lenient().when(timeProvider.dataHoraAtual()).thenReturn(DATA_HORA_ATUAL);
     }
 
     @Test
     @DisplayName("Quando não existir sessão na mesa, criar uma nova e acessar")
     void cenario_1() {
+        dadoMesa();
         dadoSessaoInexistente();
         quandoAcessar();
         deveCriarSessao();
@@ -78,6 +89,7 @@ class AcessarSessaoUseCaseTest {
     @ValueSource(ints = {2, 3})
     @DisplayName("Quando existir sessão ativa e for permitido entrar, acessar a sessão")
     void cenario_2(int tempoMinutos) {
+        dadoMesa();
         dadoSessaoAtiva();
         dadoEntradaPermitida(tempoMinutos);
         quandoAcessar();
@@ -89,6 +101,7 @@ class AcessarSessaoUseCaseTest {
     @Test
     @DisplayName("Quando existir sessão ativa e não for permitido entrar, solicitar permissão")
     void cenario_3() {
+        dadoMesa();
         dadoSessaoAtiva();
         dadoEntradaNaoPermitida();
         quandoAcessar();
@@ -97,8 +110,45 @@ class AcessarSessaoUseCaseTest {
         deveRetornarPermissaoRequerida();
     }
 
+    @Test
+    @DisplayName("Quando a mesa não existir, rejeitar o acesso")
+    void cenario_4() {
+        dadoMesaInexistente();
+        quandoAcessarComErro();
+        deveRejeitarAcessoPorMesaInexistente();
+    }
+
+    private void dadoMesa() {
+        mesa = new Mesa(command.mesaId());
+
+        when(mesaRepository.findById(command.mesaId()))
+                .thenReturn(Optional.of(mesa));
+    }
+
+    private void dadoMesaInexistente() {
+        when(mesaRepository.findById(command.mesaId()))
+                .thenReturn(Optional.empty());
+    }
+
+    private void quandoAcessarComErro() {
+        try {
+            useCase.execute(command);
+        } catch (Exception e) {
+            exception = e;
+        }
+    }
+
+    private void deveRejeitarAcessoPorMesaInexistente() {
+        assertInstanceOf(MesaNaoEncontradaException.class, exception);
+        assertEquals("Mesa não encontrada, verifique o QR Code e tente novamente", exception.getMessage());
+
+        verify(repository, never()).save(any(SessaoMesa.class));
+        verify(participanteSessaoRepository, never()).save(any(ParticipanteSessao.class));
+        verify(solicitacaoEntradaSessaoRepository, never()).save(any(SolicitacaoEntradaSessao.class));
+    }
+
     private void dadoSessaoInexistente() {
-        when(repository.obterSessaoAtiva(command.mesaId()))
+        when(repository.obterSessaoAtiva(mesa.getId()))
                 .thenReturn(Optional.empty());
 
         when(repository.save(any(SessaoMesa.class)))
@@ -107,11 +157,11 @@ class AcessarSessaoUseCaseTest {
 
     private void dadoSessaoAtiva() {
         sessao = SessaoMesa.create(
-                command.mesaId(),
+                mesa,
                 DATA_HORA_ATUAL
         );
 
-        when(repository.obterSessaoAtiva(command.mesaId()))
+        when(repository.obterSessaoAtiva(mesa.getId()))
                 .thenReturn(Optional.of(sessao));
     }
 
