@@ -184,6 +184,7 @@ class CriarPedidoUseCaseTest {
         menuItem = new MenuItem();
         menuItem.setMenuSecao(menuSecao);
         menuItem.setPreco(PRECO_MENU_ITEM);
+        menuItem.setNome("Pizza");
         menuItem.setStatus(status);
 
         when(menuItemRepository.findById(MENU_ITEM_ID))
@@ -254,7 +255,7 @@ class CriarPedidoUseCaseTest {
 
     private void deveRetornarPedidoCriado() {
         assertEquals(pedido.getParticipanteSessao().getNome(), response.nomeParticipanteSessao());
-        assertEquals(pedido.getMenuItem().getDescricao(), response.descricaoMenuItem());
+        assertEquals(pedido.getMenuItem().getNome(), response.nomeMenuItem());
         assertEquals(pedido.getValorUnitario(), response.valorUnitario());
         assertEquals(pedido.getQuantidade(), response.quantidade());
     }

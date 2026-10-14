@@ -139,7 +139,7 @@ class PedidoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(10))
                 .andExpect(jsonPath("$.nomeParticipanteSessao").value("Maria"))
-                .andExpect(jsonPath("$.descricaoMenuItem").value("Pizza"))
+                .andExpect(jsonPath("$.nomeMenuItem").value("Pizza"))
                 .andExpect(jsonPath("$.valorUnitario").value(25.90))
                 .andExpect(jsonPath("$.quantidade").value(2));
     }

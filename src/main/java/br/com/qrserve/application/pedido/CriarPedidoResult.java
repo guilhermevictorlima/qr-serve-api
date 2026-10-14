@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 public record CriarPedidoResult(
         Integer id,
         String nomeParticipanteSessao,
-        String descricaoMenuItem,
+        String nomeMenuItem,
         BigDecimal valorUnitario,
         Integer quantidade
 ) {
@@ -16,7 +16,7 @@ public record CriarPedidoResult(
         return new CriarPedidoResult(
                 pedido.getId(),
                 pedido.getParticipanteSessao().getNome(),
-                pedido.getMenuItem().getDescricao(),
+                pedido.getMenuItem().getNome(),
                 pedido.getValorUnitario(),
                 pedido.getQuantidade()
         );
