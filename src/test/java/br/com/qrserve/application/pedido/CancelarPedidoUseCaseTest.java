@@ -1,7 +1,7 @@
 package br.com.qrserve.application.pedido;
 
 import br.com.qrserve.application.time.TimeProvider;
-import br.com.qrserve.domain.exception.BusinessException;
+import br.com.qrserve.domain.exception.EstadoInvalidoException;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.exception.PedidoNaoEncontradoException;
 import br.com.qrserve.domain.pedido.Pedido;
@@ -151,7 +151,7 @@ class CancelarPedidoUseCaseTest {
 
         mensagemEsperadaException =
                 "O pedido precisa estar em aberto para ser cancelado";
-        tipoEsperadoException = BusinessException.class;
+        tipoEsperadoException = EstadoInvalidoException.class;
     }
 
     private void dadoPedidoDeOutroParticipante() {

@@ -1,6 +1,7 @@
 package br.com.qrserve.presentation.exception;
 
 import br.com.qrserve.domain.exception.BusinessException;
+import br.com.qrserve.domain.exception.EstadoInvalidoException;
 import br.com.qrserve.domain.exception.RecursoNaoEncontradoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -24,6 +26,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     private static final String MENSAGEM_ERRO_INESPERADO = "Ocorreu um erro inesperado, tente novamente mais tarde";
+    private static final String MENSAGEM_CAMPO_INVALIDO = "Valor inválido";
     private static final String MENSAGEM_CONFLITO_CONCORRENCIA = "O recurso foi alterado por outra operação, tente novamente";
 
     @ExceptionHandler(BusinessException.class)
@@ -31,6 +34,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             BusinessException exception
     ) {
         return ResponseEntity.badRequest().body(exception.getMessage());
+    }
+
+    @ExceptionHandler(EstadoInvalidoException.class)
+    public ResponseEntity<String> handle(
+            EstadoInvalidoException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
     }
 
     @ExceptionHandler(RecursoNaoEncontradoException.class)
@@ -68,7 +78,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .stream()
                 .collect(Collectors.toMap(
                         FieldError::getField,
-                        FieldError::getDefaultMessage
+                        erro -> Objects.toString(erro.getDefaultMessage(), MENSAGEM_CAMPO_INVALIDO),
+                        (primeira, segunda) -> primeira + "; " + segunda
                 ));
 
         return ResponseEntity.badRequest().body(erros);

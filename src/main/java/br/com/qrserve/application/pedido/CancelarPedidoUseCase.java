@@ -1,7 +1,7 @@
 package br.com.qrserve.application.pedido;
 
 import br.com.qrserve.application.time.TimeProvider;
-import br.com.qrserve.domain.exception.BusinessException;
+import br.com.qrserve.domain.exception.EstadoInvalidoException;
 import br.com.qrserve.domain.exception.PedidoNaoEncontradoException;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.pedido.Pedido;
@@ -35,7 +35,7 @@ public class CancelarPedidoUseCase {
         validarPermissao(pedido, participante);
 
         if (!pedido.isPedidoEmAberto()) {
-            throw new BusinessException("O pedido precisa estar em aberto para ser cancelado");
+            throw new EstadoInvalidoException("O pedido precisa estar em aberto para ser cancelado");
         }
 
         pedido.setStatus(StatusPedido.PEDIDO_CANCELADO);

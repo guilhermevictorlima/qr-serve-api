@@ -3,7 +3,7 @@ package br.com.qrserve.presentation.pedido;
 import br.com.qrserve.application.pedido.CancelarPedidoUseCase;
 import br.com.qrserve.application.pedido.ConcluirPedidoUseCase;
 import br.com.qrserve.application.pedido.CriarPedidoUseCase;
-import br.com.qrserve.domain.exception.BusinessException;
+import br.com.qrserve.domain.exception.EstadoInvalidoException;
 import br.com.qrserve.domain.exception.MenuItemNaoEncontradoException;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.exception.PedidoNaoEncontradoException;
@@ -210,10 +210,10 @@ class PedidoControllerTest {
     @Test
     @DisplayName("Dado pedido que não está em aberto, quando cancelar pedido, deve retornar erro de negócio")
     void dadoPedidoQueNaoEstaEmAbertoQuandoCancelarPedidoDeveRetornarErroDeNegocio() throws Exception {
-        dadoUseCaseDeCancelarLancando(new BusinessException("O pedido precisa estar em aberto para ser cancelado"));
+        dadoUseCaseDeCancelarLancando(new EstadoInvalidoException("O pedido precisa estar em aberto para ser cancelado"));
 
         quandoCancelarPedido("1")
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("O pedido precisa estar em aberto para ser cancelado"));
     }
 
@@ -278,10 +278,10 @@ class PedidoControllerTest {
     @Test
     @DisplayName("Dado pedido que não está em aberto, quando concluir pedido, deve retornar erro de negócio")
     void dadoPedidoQueNaoEstaEmAbertoQuandoConcluirPedidoDeveRetornarErroDeNegocio() throws Exception {
-        dadoUseCaseDeConcluirLancando(new BusinessException("O pedido precisa estar em aberto para ser concluído"));
+        dadoUseCaseDeConcluirLancando(new EstadoInvalidoException("O pedido precisa estar em aberto para ser concluído"));
 
         quandoConcluirPedido("1")
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(content().string("O pedido precisa estar em aberto para ser concluído"));
     }
 

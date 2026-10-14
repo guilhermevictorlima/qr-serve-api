@@ -1,6 +1,6 @@
 package br.com.qrserve.application.pedido;
 
-import br.com.qrserve.domain.exception.BusinessException;
+import br.com.qrserve.domain.exception.EstadoInvalidoException;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.exception.PedidoNaoEncontradoException;
 import br.com.qrserve.domain.pedido.Pedido;
@@ -142,7 +142,7 @@ class ConcluirPedidoUseCaseTest {
                 .thenReturn(Optional.of(pedido));
 
         mensagemEsperadaException = "O pedido precisa estar em aberto para ser concluído";
-        tipoEsperadoException = BusinessException.class;
+        tipoEsperadoException = EstadoInvalidoException.class;
     }
 
     private void dadoPedidoDeOutraSessao() {

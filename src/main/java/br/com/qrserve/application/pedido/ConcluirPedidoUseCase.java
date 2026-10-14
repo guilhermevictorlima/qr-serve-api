@@ -1,6 +1,6 @@
 package br.com.qrserve.application.pedido;
 
-import br.com.qrserve.domain.exception.BusinessException;
+import br.com.qrserve.domain.exception.EstadoInvalidoException;
 import br.com.qrserve.domain.exception.PedidoNaoEncontradoException;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.pedido.Pedido;
@@ -32,7 +32,7 @@ public class ConcluirPedidoUseCase {
         validarPermissao(pedido, participante);
 
         if (!pedido.isPedidoEmAberto()) {
-            throw new BusinessException("O pedido precisa estar em aberto para ser concluído");
+            throw new EstadoInvalidoException("O pedido precisa estar em aberto para ser concluído");
         }
 
         pedido.setStatus(StatusPedido.PEDIDO_CONCLUIDO);
