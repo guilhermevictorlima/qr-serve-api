@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -46,6 +47,10 @@ public class Pedido {
 
     @Column(name = "data_hora_pedido", nullable = false)
     private LocalDateTime dataHoraPedido;
+
+    @Version
+    @Column(name = "versao", nullable = false)
+    private Long versao;
 
     @Column(name = "data_hora_cancelamento")
     private LocalDateTime dataHoraCancelamento;

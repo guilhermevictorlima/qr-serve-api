@@ -7,6 +7,7 @@ import br.com.qrserve.domain.exception.BusinessException;
 import br.com.qrserve.domain.exception.MenuItemNaoEncontradoException;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.exception.PedidoNaoEncontradoException;
+import br.com.qrserve.domain.pedido.Pedido;
 import br.com.qrserve.presentation.pedido.form.CriarPedidoForm;
 import br.com.qrserve.application.pedido.CriarPedidoCommand;
 import br.com.qrserve.application.pedido.CriarPedidoResult;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -232,6 +234,26 @@ class PedidoControllerTest {
         quandoCancelarPedido("1")
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().string(MENSAGEM_ERRO_INESPERADO));
+    }
+
+    @Test
+    @DisplayName("Dado conflito de atualização concorrente, quando cancelar pedido, deve retornar conflito")
+    void dadoConflitoDeAtualizacaoQuandoCancelarPedidoDeveRetornarConflito() throws Exception {
+        dadoUseCaseDeCancelarLancando(new ObjectOptimisticLockingFailureException(Pedido.class, 1));
+
+        quandoCancelarPedido("1")
+                .andExpect(status().isConflict())
+                .andExpect(content().string("O recurso foi alterado por outra operação, tente novamente"));
+    }
+
+    @Test
+    @DisplayName("Dado conflito de atualização concorrente, quando concluir pedido, deve retornar conflito")
+    void dadoConflitoDeAtualizacaoQuandoConcluirPedidoDeveRetornarConflito() throws Exception {
+        dadoUseCaseDeConcluirLancando(new ObjectOptimisticLockingFailureException(Pedido.class, 1));
+
+        quandoConcluirPedido("1")
+                .andExpect(status().isConflict())
+                .andExpect(content().string("O recurso foi alterado por outra operação, tente novamente"));
     }
 
     @Test

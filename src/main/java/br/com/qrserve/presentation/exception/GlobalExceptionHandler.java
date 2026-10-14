@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,6 +24,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     private static final String MENSAGEM_ERRO_INESPERADO = "Ocorreu um erro inesperado, tente novamente mais tarde";
+    private static final String MENSAGEM_CONFLITO_CONCORRENCIA = "O recurso foi alterado por outra operação, tente novamente";
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<String> handle(
@@ -36,6 +38,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             RecursoNaoEncontradoException exception
     ) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<String> handle(
+            ObjectOptimisticLockingFailureException exception
+    ) {
+        LOGGER.warn("CONFLITO DE ATUALIZAÇÃO CONCORRENTE", exception);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(MENSAGEM_CONFLITO_CONCORRENCIA);
     }
 
     @ExceptionHandler(Exception.class)
