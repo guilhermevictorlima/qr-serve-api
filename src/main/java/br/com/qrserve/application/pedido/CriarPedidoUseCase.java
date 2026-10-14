@@ -12,7 +12,7 @@ import br.com.qrserve.domain.sessao.SessaoMesa;
 import br.com.qrserve.infrastructure.persistence.menu.MenuItemRepository;
 import br.com.qrserve.infrastructure.persistence.pedido.PedidoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,15 +35,15 @@ public class CriarPedidoUseCase {
         this.timeProvider = timeProvider;
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public CriarPedidoResult execute(CriarPedidoCommand command) {
         ParticipanteSessao participanteSessao = obterParticipanteSessao(command);
         MenuItem menuItem = obterMenuItem(command);
         validarPedidoPermitido(participanteSessao, menuItem);
 
         Pedido pedido = new Pedido();
-        pedido.setParticipanteSessaoId(participanteSessao);
-        pedido.setMenuItemId(menuItem);
+        pedido.setParticipanteSessao(participanteSessao);
+        pedido.setMenuItem(menuItem);
         pedido.setValorUnitario(menuItem.getPreco());
         pedido.setQuantidade(command.quantidade());
         pedido.setStatus(StatusPedido.PEDIDO_REALIZADO);

@@ -6,7 +6,7 @@ import br.com.qrserve.domain.sessao.ParticipanteSessao;
 import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SolicitacaoEntradaSessaoRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.Objects;
 
 @Service
 public class ResponderSolicitacaoEntradaSessaoUseCase {
-    private final Logger LOGGER = LoggerFactory.getLogger(ResponderSolicitacaoEntradaSessaoUseCase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResponderSolicitacaoEntradaSessaoUseCase.class);
 
     private final SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository;
     private final ParticipanteSessaoRepository participanteSessaoRepository;
@@ -27,7 +27,7 @@ public class ResponderSolicitacaoEntradaSessaoUseCase {
         this.feedbackSender = feedbackSender;
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void execute(ResponderSolicitacaoEntradaSessaoCommand command) {
         SolicitacaoEntradaSessao solicitacao = obterSolicitacao(command);
         ParticipanteSessao participanteRespondente = obterParticipanteRespondente(command);

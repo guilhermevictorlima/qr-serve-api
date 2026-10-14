@@ -25,7 +25,7 @@ public class SolicitacaoEntradaSessao {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sessao_id", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_participante_sessao_mesa"))
+            foreignKey = @ForeignKey(name = "fk_solicitacao_sessao_mesa"))
     private SessaoMesa sessao;
 
     @Embedded

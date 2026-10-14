@@ -53,6 +53,4 @@ public class Menu {
     public void setSecoes(List<MenuSecao> secoes) {
         this.secoes = secoes;
     }
-
-    // getters e setters
 }

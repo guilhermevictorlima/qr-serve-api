@@ -63,7 +63,7 @@ public class Pedido {
         return participanteSessao;
     }
 
-    public void setParticipanteSessaoId(ParticipanteSessao participanteSessao) {
+    public void setParticipanteSessao(ParticipanteSessao participanteSessao) {
         this.participanteSessao = participanteSessao;
     }
 
@@ -71,7 +71,7 @@ public class Pedido {
         return menuItem;
     }
 
-    public void setMenuItemId(MenuItem menuItem) {
+    public void setMenuItem(MenuItem menuItem) {
         this.menuItem = menuItem;
     }
 

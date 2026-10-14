@@ -1,13 +1,13 @@
 package br.com.qrserve.infrastructure.time;
 
 import br.com.qrserve.application.time.TimeProvider;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Service
+@Component
 public class SystemTimeProvider implements TimeProvider {
 
     private final Clock clock;

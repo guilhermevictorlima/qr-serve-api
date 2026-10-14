@@ -123,7 +123,7 @@ class CancelarPedidoUseCaseTest {
 
     private void dadoPedidoEmAberto() {
         pedido = new Pedido();
-        pedido.setParticipanteSessaoId(participante);
+        pedido.setParticipanteSessao(participante);
         pedido.setStatus(StatusPedido.PEDIDO_REALIZADO);
 
         when(pedidoRepository.findById(1))
@@ -143,7 +143,7 @@ class CancelarPedidoUseCaseTest {
 
     private void dadoPedidoNaoEstiverEmAberto() {
         pedido = new Pedido();
-        pedido.setParticipanteSessaoId(participante);
+        pedido.setParticipanteSessao(participante);
         pedido.setStatus(StatusPedido.PEDIDO_CONCLUIDO);
 
         when(pedidoRepository.findById(1))
@@ -159,7 +159,7 @@ class CancelarPedidoUseCaseTest {
                 new ParticipanteSessao(new SessaoMesa(1), TokenUsuario.create(), "Maria");
 
         pedido = new Pedido();
-        pedido.setParticipanteSessaoId(outroParticipante);
+        pedido.setParticipanteSessao(outroParticipante);
         pedido.setStatus(StatusPedido.PEDIDO_REALIZADO);
 
         when(pedidoRepository.findById(1))

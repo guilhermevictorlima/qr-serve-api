@@ -1,9 +1,9 @@
 package br.com.qrserve.infrastructure.notification;
 
 import br.com.qrserve.application.sessao.FeedbackSender;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class WebSocketNotification implements FeedbackSender {
 
     @Override

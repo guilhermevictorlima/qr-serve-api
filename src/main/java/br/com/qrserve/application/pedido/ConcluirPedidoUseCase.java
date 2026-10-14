@@ -8,7 +8,7 @@ import br.com.qrserve.domain.pedido.StatusPedido;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
 import br.com.qrserve.infrastructure.persistence.pedido.PedidoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class ConcluirPedidoUseCase {
         this.participanteSessaoRepository = participanteSessaoRepository;
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void execute(Integer pedidoId, String tokenUsuario) {
         ParticipanteSessao participante = obterParticipante(tokenUsuario);
         Pedido pedido = obterPedido(pedidoId);

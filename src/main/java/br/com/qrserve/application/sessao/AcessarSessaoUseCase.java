@@ -11,7 +11,7 @@ import br.com.qrserve.infrastructure.persistence.menu.MesaRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SessaoMesaRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SolicitacaoEntradaSessaoRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class AcessarSessaoUseCase {
         this.participanteSessaoRepository = participanteSessaoRepository;
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public AcessarSessaoResult execute(AcessarSessaoCommand command) {
         TokenUsuario token = TokenUsuario.create();
 

@@ -118,7 +118,7 @@ class ConcluirPedidoUseCaseTest {
                 new ParticipanteSessao(new SessaoMesa(1), TokenUsuario.create(), "Maria");
 
         pedido = new Pedido();
-        pedido.setParticipanteSessaoId(outroParticipanteDaMesmaSessao);
+        pedido.setParticipanteSessao(outroParticipanteDaMesmaSessao);
         pedido.setStatus(StatusPedido.PEDIDO_REALIZADO);
 
         when(pedidoRepository.findById(1))
@@ -135,7 +135,7 @@ class ConcluirPedidoUseCaseTest {
 
     private void dadoPedidoNaoEstiverEmAberto() {
         pedido = new Pedido();
-        pedido.setParticipanteSessaoId(participante);
+        pedido.setParticipanteSessao(participante);
         pedido.setStatus(StatusPedido.PEDIDO_CONCLUIDO);
 
         when(pedidoRepository.findById(1))
@@ -150,7 +150,7 @@ class ConcluirPedidoUseCaseTest {
                 new ParticipanteSessao(new SessaoMesa(2), TokenUsuario.create(), "Maria");
 
         pedido = new Pedido();
-        pedido.setParticipanteSessaoId(participanteDeOutraSessao);
+        pedido.setParticipanteSessao(participanteDeOutraSessao);
         pedido.setStatus(StatusPedido.PEDIDO_REALIZADO);
 
         when(pedidoRepository.findById(1))
