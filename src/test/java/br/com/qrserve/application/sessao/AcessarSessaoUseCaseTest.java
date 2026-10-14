@@ -6,7 +6,7 @@ import br.com.qrserve.domain.mesa.Mesa;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
 import br.com.qrserve.domain.sessao.SessaoMesa;
 import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
-import br.com.qrserve.infrastructure.persistence.menu.MesaRepository;
+import br.com.qrserve.infrastructure.persistence.mesa.MesaRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SessaoMesaRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SolicitacaoEntradaSessaoRepository;

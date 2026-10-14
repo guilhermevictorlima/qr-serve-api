@@ -1,7 +1,7 @@
 package br.com.qrserve.presentation.mesa;
 
 import br.com.qrserve.domain.mesa.Mesa;
-import br.com.qrserve.infrastructure.persistence.menu.MesaRepository;
+import br.com.qrserve.infrastructure.persistence.mesa.MesaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

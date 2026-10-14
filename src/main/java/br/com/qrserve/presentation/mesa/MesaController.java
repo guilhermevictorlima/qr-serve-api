@@ -1,7 +1,7 @@
 package br.com.qrserve.presentation.mesa;
 
 import br.com.qrserve.presentation.mesa.response.MesaResponse;
-import br.com.qrserve.infrastructure.persistence.menu.MesaRepository;
+import br.com.qrserve.infrastructure.persistence.mesa.MesaRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,4 +1,4 @@
-package br.com.qrserve.infrastructure.persistence.menu;
+package br.com.qrserve.infrastructure.persistence.mesa;
 
 import br.com.qrserve.domain.mesa.Mesa;
 import jakarta.persistence.LockModeType;
