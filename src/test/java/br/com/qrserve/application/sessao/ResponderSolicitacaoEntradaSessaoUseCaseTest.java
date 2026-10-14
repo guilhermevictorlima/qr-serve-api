@@ -99,6 +99,16 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
         deveRejeitarResposta();
     }
 
+    @Test
+    @DisplayName("Quando o participante respondente for de outra sessão, rejeitar a resposta")
+    void cenario_5() {
+        dadoSolicitacaoDeEntrada();
+        dadoParticipanteRespondenteDeOutraSessao();
+        dadoRespostaAprovada();
+        quandoResponderSolicitacao();
+        deveRejeitarResposta();
+    }
+
     private void dadoSolicitacaoDeEntrada() {
         solicitacao = criarSolicitacao();
 
@@ -158,6 +168,18 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
         when(participanteSessaoRepository
                 .obterParticipantePorToken(tokenRespondente))
                 .thenReturn(Optional.empty());
+
+        mensagemEsperadaException = "Participante respondente não encontrado, token identificador inválido";
+        tipoEsperadoException = ParticipanteSessaoNaoEncontradoException.class;
+    }
+
+    private void dadoParticipanteRespondenteDeOutraSessao() {
+        TokenUsuario token = TokenUsuario.create();
+        tokenRespondente = token.getValor();
+
+        when(participanteSessaoRepository
+                .obterParticipantePorToken(tokenRespondente))
+                .thenReturn(Optional.of(new ParticipanteSessao(new SessaoMesa(2), token, "Ciclano")));
 
         mensagemEsperadaException = "Participante respondente não encontrado, token identificador inválido";
         tipoEsperadoException = ParticipanteSessaoNaoEncontradoException.class;

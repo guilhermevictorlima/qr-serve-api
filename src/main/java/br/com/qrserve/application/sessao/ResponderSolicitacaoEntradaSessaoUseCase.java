@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class ResponderSolicitacaoEntradaSessaoUseCase {
     private final Logger LOGGER = LoggerFactory.getLogger(ResponderSolicitacaoEntradaSessaoUseCase.class);
@@ -29,7 +31,8 @@ public class ResponderSolicitacaoEntradaSessaoUseCase {
     @Transactional(rollbackOn = Exception.class)
     public void execute(ResponderSolicitacaoEntradaSessaoForm form) {
         SolicitacaoEntradaSessao solicitacao = obterSolicitacao(form);
-        ParticipanteSessao participanteRespondente = obterParticipanteRespondente(form); // TODO será usado na implementação da notificação via web socket, na task QR-004
+        ParticipanteSessao participanteRespondente = obterParticipanteRespondente(form);
+        validarRespondentePertenceASessao(solicitacao, participanteRespondente);
 
         if (form.resposta().isSolicitacaoAprovada()) {
             participanteSessaoRepository.save(ParticipanteSessao.from(solicitacao));
@@ -47,6 +50,13 @@ public class ResponderSolicitacaoEntradaSessaoUseCase {
                     LOGGER.error("SOLICITAÇÃO NÃO ENCONTRADA -- {}", form);
                     return new SolicitacaoEntradaSessaoNaoEncontradaException("Solicitação de entrada não encontrada. Verifique se já foi respondida e tente novamente");
                 });
+    }
+
+    private void validarRespondentePertenceASessao(SolicitacaoEntradaSessao solicitacao, ParticipanteSessao respondente) {
+        if (!Objects.equals(solicitacao.getSessao().getId(), respondente.getSessao().getId())) {
+            LOGGER.error("RESPONDENTE DE OUTRA SESSÃO -- solicitacaoId: {} / respondenteId: {}", solicitacao.getId(), respondente.getId());
+            throw new ParticipanteSessaoNaoEncontradoException("Participante respondente não encontrado, token identificador inválido");
+        }
     }
 
     private ParticipanteSessao obterParticipanteRespondente(ResponderSolicitacaoEntradaSessaoForm form) {
