@@ -51,7 +51,7 @@ public class AcessarSessaoUseCase {
     }
 
     private Mesa obterMesa(Integer mesaId) {
-        return mesaRepository.findById(mesaId)
+        return mesaRepository.obterParaAtualizar(mesaId)
                 .orElseThrow(() -> {
                     LOGGER.error("MESA NÃO ENCONTRADA -- {}", mesaId);
                     return new MesaNaoEncontradaException("Mesa não encontrada, verifique o QR Code e tente novamente");

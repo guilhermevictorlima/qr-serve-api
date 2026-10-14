@@ -121,12 +121,12 @@ class AcessarSessaoUseCaseTest {
     private void dadoMesa() {
         mesa = new Mesa(command.mesaId());
 
-        when(mesaRepository.findById(command.mesaId()))
+        when(mesaRepository.obterParaAtualizar(command.mesaId()))
                 .thenReturn(Optional.of(mesa));
     }
 
     private void dadoMesaInexistente() {
-        when(mesaRepository.findById(command.mesaId()))
+        when(mesaRepository.obterParaAtualizar(command.mesaId()))
                 .thenReturn(Optional.empty());
     }
 

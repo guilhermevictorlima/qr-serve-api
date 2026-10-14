@@ -128,6 +128,9 @@ CREATE TABLE sessao_mesa
 
 CREATE INDEX idx_sessao_mesa_mesa_id ON sessao_mesa (mesa_id);
 
+-- Garante no máximo uma sessão ativa por mesa
+CREATE UNIQUE INDEX uq_sessao_mesa_ativa_por_mesa ON sessao_mesa (mesa_id) WHERE data_hora_encerramento IS NULL;
+
 CREATE TABLE participante_sessao
 (
     id        INTEGER GENERATED ALWAYS AS IDENTITY,
