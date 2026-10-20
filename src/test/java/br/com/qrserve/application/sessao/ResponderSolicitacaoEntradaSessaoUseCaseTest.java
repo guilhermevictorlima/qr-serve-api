@@ -57,7 +57,7 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
     private String mensagemEsperadaException;
 
     @Test
-    @DisplayName("Quando a solicitação for aprovada, adicionar o solicitante à sessão")
+    @DisplayName("@spec:AC-007 Quando a solicitação for aprovada, adicionar o solicitante à sessão")
     void cenario_1() {
         dadoSolicitacaoDeEntrada();
         dadoParticipanteRespondente();
@@ -68,7 +68,7 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
     }
 
     @Test
-    @DisplayName("Quando a solicitação for recusada, notificar o solicitante")
+    @DisplayName("@spec:AC-008 Quando a solicitação for recusada, notificar o solicitante")
     void cenario_2() {
         dadoSolicitacaoDeEntrada();
         dadoParticipanteRespondente();
@@ -88,7 +88,7 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
     }
 
     @Test
-    @DisplayName("Quando o participante respondente não existir, rejeitar a resposta")
+    @DisplayName("@spec:AC-009 Quando o participante respondente não existir, rejeitar a resposta")
     void cenario_4() {
         dadoSolicitacaoDeEntrada();
         dadoParticipanteRespondenteInexistente();
@@ -98,7 +98,7 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
     }
 
     @Test
-    @DisplayName("Quando o participante respondente for de outra sessão, rejeitar a resposta")
+    @DisplayName("@spec:AC-009 Quando o participante respondente for de outra sessão, rejeitar a resposta")
     void cenario_5() {
         dadoSolicitacaoDeEntrada();
         dadoParticipanteRespondenteDeOutraSessao();
