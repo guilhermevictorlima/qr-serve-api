@@ -37,6 +37,8 @@ public class SolicitacaoEntradaSessao {
     @Column(name = "data_hora_solicitacao", nullable = false)
     private LocalDateTime dataHoraSolicitacao;
 
+    private static final int LIMITE_SOLICITACAO_EM_MINUTOS = 3;
+
     public SolicitacaoEntradaSessao() {}
 
     public SolicitacaoEntradaSessao(SessaoMesa sessao, TokenUsuario token, String nome, LocalDateTime dataHoraSolicitacao) {
@@ -44,6 +46,10 @@ public class SolicitacaoEntradaSessao {
         this.token = token;
         this.nome = nome;
         this.dataHoraSolicitacao = dataHoraSolicitacao;
+    }
+
+    public boolean isExpirada(LocalDateTime dataHoraAtual) {
+        return dataHoraAtual.isAfter(dataHoraSolicitacao.plusMinutes(LIMITE_SOLICITACAO_EM_MINUTOS));
     }
 
     public Integer getId() {

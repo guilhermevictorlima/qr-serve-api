@@ -34,3 +34,5 @@ build/
 
 ### Claude ###
 CLAUDE.local.md
+# onp-spec: provas geradas pelo verify
+.spec/verification/

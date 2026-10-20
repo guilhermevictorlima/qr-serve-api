@@ -4,6 +4,7 @@ import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface SolicitacaoEntradaSessaoRepository extends JpaRepository<SolicitacaoEntradaSessao, Integer> {
@@ -13,5 +14,9 @@ public interface SolicitacaoEntradaSessaoRepository extends JpaRepository<Solici
             """, nativeQuery = true)
     Optional<SolicitacaoEntradaSessao> obterSolicitacaoPorToken(String tokenUsuario);
 
+    @Query(value = """
+            select * from solicitacao_entrada_sessao where sessao_id = ?1 order by data_hora_solicitacao
+            """, nativeQuery = true)
+    List<SolicitacaoEntradaSessao> listarPorSessao(Integer sessaoId);
 
 }

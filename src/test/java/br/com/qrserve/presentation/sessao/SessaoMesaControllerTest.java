@@ -1,6 +1,13 @@
 package br.com.qrserve.presentation.sessao;
 
 import br.com.qrserve.application.sessao.AcessarSessaoUseCase;
+import br.com.qrserve.application.sessao.ListarSolicitacoesPendentesCommand;
+import br.com.qrserve.application.sessao.ListarSolicitacoesPendentesUseCase;
+import br.com.qrserve.domain.sessao.SessaoMesa;
+import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
+import br.com.qrserve.domain.sessao.TokenUsuario;
+import java.time.LocalDateTime;
+import java.util.List;
 import br.com.qrserve.application.sessao.ResponderSolicitacaoEntradaSessaoUseCase;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.exception.SolicitacaoEntradaSessaoNaoEncontradaException;
@@ -27,6 +34,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,6 +56,11 @@ class SessaoMesaControllerTest {
 
     @MockitoBean
     private ResponderSolicitacaoEntradaSessaoUseCase responderSolicitacaoEntradaSessaoUseCase;
+
+    @MockitoBean
+    private ListarSolicitacoesPendentesUseCase listarSolicitacoesPendentesUseCase;
+
+    private TokenUsuario tokenSolicitante;
 
     @Test
     @DisplayName("Dado formulário válido, quando acessar sessão, deve acessar sessão")
@@ -333,6 +346,58 @@ class SessaoMesaControllerTest {
                 patch("/sessao/solicitacao")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(corpo)
+        );
+    }
+
+    @Test
+    @DisplayName("@spec:AC-005 Dado solicitações pendentes, quando listar solicitações, deve retornar as solicitações")
+    void dadoSolicitacoesPendentesQuandoListarSolicitacoesDeveRetornarAsSolicitacoes() throws Exception {
+        dadoSolicitacaoPendentePeloUseCase();
+
+        quandoListarSolicitacoes("5", "token-participante")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].tokenUsuario").value(tokenSolicitante.getValor()))
+                .andExpect(jsonPath("$[0].nome").value("Fulano"));
+
+        verify(listarSolicitacoesPendentesUseCase)
+                .execute(new ListarSolicitacoesPendentesCommand(5, "token-participante"));
+    }
+
+    @Test
+    @DisplayName("Dado participante inexistente, quando listar solicitações, deve retornar não encontrado")
+    void dadoParticipanteInexistenteQuandoListarSolicitacoesDeveRetornarNaoEncontrado() throws Exception {
+        dadoUseCaseDeListarLancando(new ParticipanteSessaoNaoEncontradoException("Participante não encontrado, token identificador inválido"));
+
+        quandoListarSolicitacoes("5", "token-invalido")
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.mensagem").value("Participante não encontrado, token identificador inválido"));
+    }
+
+    @Test
+    @DisplayName("Dado requisição sem token do usuário, quando listar solicitações, deve retornar requisição inválida")
+    void dadoRequisicaoSemTokenQuandoListarSolicitacoesDeveRetornarRequisicaoInvalida() throws Exception {
+        mockMvc.perform(get("/sessao/5/solicitacoes"))
+                .andExpect(status().isBadRequest());
+
+        verify(listarSolicitacoesPendentesUseCase, never()).execute(any());
+    }
+
+    private void dadoSolicitacaoPendentePeloUseCase() {
+        tokenSolicitante = TokenUsuario.create();
+
+        when(listarSolicitacoesPendentesUseCase.execute(any(ListarSolicitacoesPendentesCommand.class)))
+                .thenReturn(List.of(new SolicitacaoEntradaSessao(new SessaoMesa(5), tokenSolicitante, "Fulano", LocalDateTime.of(2026, 9, 1, 12, 0))));
+    }
+
+    private void dadoUseCaseDeListarLancando(RuntimeException exception) {
+        when(listarSolicitacoesPendentesUseCase.execute(any(ListarSolicitacoesPendentesCommand.class))).thenThrow(exception);
+    }
+
+    private ResultActions quandoListarSolicitacoes(String sessaoId, String tokenUsuario) throws Exception {
+        return mockMvc.perform(
+                get("/sessao/{sessaoId}/solicitacoes", sessaoId)
+                        .header("X-Token-Usuario", tokenUsuario)
         );
     }
 
