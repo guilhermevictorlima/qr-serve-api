@@ -35,7 +35,7 @@ class ParticipanteSessaoControllerTest {
     private TokenUsuario tokenJoao;
 
     @Test
-    @DisplayName("Dado sessão com participantes, quando listar participantes, deve retornar os participantes")
+    @DisplayName("@spec:AC-012 Dado sessão com participantes, quando listar participantes, deve retornar os participantes")
     void dadoSessaoComParticipantesQuandoListarParticipantesDeveRetornarOsParticipantes() throws Exception {
         dadoParticipantesNaSessao(5);
 
@@ -53,7 +53,7 @@ class ParticipanteSessaoControllerTest {
     }
 
     @Test
-    @DisplayName("Dado sessão sem participantes, quando listar participantes, deve retornar lista vazia")
+    @DisplayName("@spec:AC-013 Dado sessão sem participantes, quando listar participantes, deve retornar lista vazia")
     void dadoSessaoSemParticipantesQuandoListarParticipantesDeveRetornarListaVazia() throws Exception {
         dadoSessaoSemParticipantes(5);
 

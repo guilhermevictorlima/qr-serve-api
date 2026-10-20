@@ -85,6 +85,22 @@ Como participante da sessão, quero aprovar ou recusar quem pede para entrar, pa
 - **Quando** alguém que não é participante tenta aprová-la
 - **Então** a ação é negada e a solicitação continua pendente (forbidden)
 
+### US-005 — Ver os participantes da sessão
+
+Como participante da sessão, quero ver quem está na sessão da mesa, para que eu saiba com quem estou pedindo.
+
+#### AC-012 — Participantes da sessão são listados
+
+- **Dado** uma sessão com participantes
+- **Quando** um participante consulta os participantes da sessão
+- **Então** ele vê o nome de cada participante da sessão (lista com sessão, token e nome)
+
+#### AC-013 — Sessão sem participantes retorna lista vazia
+
+- **Dado** uma sessão sem participantes
+- **Quando** alguém consulta os participantes da sessão
+- **Então** a lista volta vazia
+
 ## Fora de escopo
 
 - Pedidos, cardápio e painel da equipe.
@@ -105,4 +121,5 @@ Como participante da sessão, quero aprovar ou recusar quem pede para entrar, pa
 | ID | Pergunta | Status | Resposta |
 |---|---|---|---|
 | Q-001 | Solicitação pendente expira? Após quanto tempo? | respondida | Expira em 3 minutos (AC-010) |
+| Q-003 | A listagem de participantes (`GET /participantes/{sessaoId}`) deve exigir o token de um participante da sessão, como a listagem de solicitações exige? Hoje qualquer pessoa com o id da sessão consegue listar | aberta | — |
 | Q-002 | Solicitante recusado pode pedir de novo? | respondida | Pode, mas precisa reiniciar o fluxo (escanear o QR / chamar a API de novo) (AC-011) |
