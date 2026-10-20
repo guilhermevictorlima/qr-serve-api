@@ -27,43 +27,44 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final String MENSAGEM_ERRO_INESPERADO = "Ocorreu um erro inesperado, tente novamente mais tarde";
     private static final String MENSAGEM_CAMPO_INVALIDO = "Valor inválido";
+    private static final String MENSAGEM_REQUISICAO_INVALIDA = "Requisição inválida";
     private static final String MENSAGEM_CONFLITO_CONCORRENCIA = "O recurso foi alterado por outra operação, tente novamente";
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<String> handle(
+    public ResponseEntity<ErroResponse> handle(
             BusinessException exception
     ) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
+        return ResponseEntity.badRequest().body(ErroResponse.of(exception.getMessage()));
     }
 
     @ExceptionHandler(EstadoInvalidoException.class)
-    public ResponseEntity<String> handle(
+    public ResponseEntity<ErroResponse> handle(
             EstadoInvalidoException exception
     ) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ErroResponse.of(exception.getMessage()));
     }
 
     @ExceptionHandler(RecursoNaoEncontradoException.class)
-    public ResponseEntity<String> handle(
+    public ResponseEntity<ErroResponse> handle(
             RecursoNaoEncontradoException exception
     ) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErroResponse.of(exception.getMessage()));
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
-    public ResponseEntity<String> handle(
+    public ResponseEntity<ErroResponse> handle(
             ObjectOptimisticLockingFailureException exception
     ) {
         LOGGER.warn("CONFLITO DE ATUALIZAÇÃO CONCORRENTE", exception);
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(MENSAGEM_CONFLITO_CONCORRENCIA);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ErroResponse.of(MENSAGEM_CONFLITO_CONCORRENCIA));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handle(
+    public ResponseEntity<ErroResponse> handle(
             Exception exception
     ) {
         LOGGER.error("ERRO INESPERADO", exception);
-        return ResponseEntity.internalServerError().body(MENSAGEM_ERRO_INESPERADO);
+        return ResponseEntity.internalServerError().body(ErroResponse.of(MENSAGEM_ERRO_INESPERADO));
     }
 
     @Override
@@ -82,7 +83,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         (primeira, segunda) -> primeira + "; " + segunda
                 ));
 
-        return ResponseEntity.badRequest().body(erros);
+        return ResponseEntity.badRequest().body(ErroResponse.of(MENSAGEM_REQUISICAO_INVALIDA, erros));
     }
 
 }
