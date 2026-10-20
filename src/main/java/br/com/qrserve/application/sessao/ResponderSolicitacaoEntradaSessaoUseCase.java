@@ -1,5 +1,7 @@
 package br.com.qrserve.application.sessao;
 
+import br.com.qrserve.application.time.TimeProvider;
+import br.com.qrserve.domain.exception.EstadoInvalidoException;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.exception.SolicitacaoEntradaSessaoNaoEncontradaException;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
@@ -20,8 +22,10 @@ public class ResponderSolicitacaoEntradaSessaoUseCase {
     private final SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository;
     private final ParticipanteSessaoRepository participanteSessaoRepository;
     private final FeedbackSender feedbackSender;
+    private final TimeProvider timeProvider;
 
-    public ResponderSolicitacaoEntradaSessaoUseCase(SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository, ParticipanteSessaoRepository participanteSessaoRepository, FeedbackSender feedbackSender) {
+    public ResponderSolicitacaoEntradaSessaoUseCase(SolicitacaoEntradaSessaoRepository solicitacaoEntradaSessaoRepository, ParticipanteSessaoRepository participanteSessaoRepository, FeedbackSender feedbackSender, TimeProvider timeProvider) {
+        this.timeProvider = timeProvider;
         this.solicitacaoEntradaSessaoRepository = solicitacaoEntradaSessaoRepository;
         this.participanteSessaoRepository = participanteSessaoRepository;
         this.feedbackSender = feedbackSender;
@@ -32,6 +36,7 @@ public class ResponderSolicitacaoEntradaSessaoUseCase {
         SolicitacaoEntradaSessao solicitacao = obterSolicitacao(command);
         ParticipanteSessao participanteRespondente = obterParticipanteRespondente(command);
         validarRespondentePertenceASessao(solicitacao, participanteRespondente);
+        validarSolicitacaoNaoExpirada(solicitacao);
 
         if (command.resposta().isAprovada()) {
             participanteSessaoRepository.save(ParticipanteSessao.from(solicitacao));
@@ -55,6 +60,13 @@ public class ResponderSolicitacaoEntradaSessaoUseCase {
         if (!Objects.equals(solicitacao.getSessao().getId(), respondente.getSessao().getId())) {
             LOGGER.error("RESPONDENTE DE OUTRA SESSÃO -- solicitacaoId: {} / respondenteId: {}", solicitacao.getId(), respondente.getId());
             throw new ParticipanteSessaoNaoEncontradoException("Participante respondente não encontrado, token identificador inválido");
+        }
+    }
+
+    private void validarSolicitacaoNaoExpirada(SolicitacaoEntradaSessao solicitacao) {
+        if (solicitacao.isExpirada(timeProvider.dataHoraAtual())) {
+            LOGGER.error("SOLICITAÇÃO EXPIRADA -- solicitacaoId: {}", solicitacao.getId());
+            throw new EstadoInvalidoException("Solicitação de entrada expirada. Escaneie o QR Code novamente");
         }
     }
 
