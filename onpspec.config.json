@@ -1,5 +1,5 @@
 {
-  "testCommand": "./mvnw test",
+  "testCommand": ".\\mvnw.cmd test",
   "reporter": "exitcode",
   "testGlobs": [
     "src/test/java/**"
