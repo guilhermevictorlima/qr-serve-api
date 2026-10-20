@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,7 +76,7 @@ class AcessarSessaoUseCaseTest {
     }
 
     @Test
-    @DisplayName("Quando não existir sessão na mesa, criar uma nova e acessar")
+    @DisplayName("@spec:AC-001 Quando não existir sessão na mesa, criar uma nova e acessar")
     void cenario_1() {
         dadoMesa();
         dadoSessaoInexistente();
@@ -87,7 +88,7 @@ class AcessarSessaoUseCaseTest {
 
     @ParameterizedTest
     @ValueSource(ints = {2, 3})
-    @DisplayName("Quando existir sessão ativa e for permitido entrar, acessar a sessão")
+    @DisplayName("@spec:AC-003 Quando existir sessão ativa e for permitido entrar, acessar a sessão")
     void cenario_2(int tempoMinutos) {
         dadoMesa();
         dadoSessaoAtiva();
@@ -99,7 +100,7 @@ class AcessarSessaoUseCaseTest {
     }
 
     @Test
-    @DisplayName("Quando existir sessão ativa e não for permitido entrar, solicitar permissão")
+    @DisplayName("@spec:AC-004 Quando existir sessão ativa e não for permitido entrar, solicitar permissão")
     void cenario_3() {
         dadoMesa();
         dadoSessaoAtiva();
@@ -111,11 +112,22 @@ class AcessarSessaoUseCaseTest {
     }
 
     @Test
-    @DisplayName("Quando a mesa não existir, rejeitar o acesso")
+    @DisplayName("@spec:AC-002 Quando a mesa não existir, rejeitar o acesso")
     void cenario_4() {
         dadoMesaInexistente();
         quandoAcessarComErro();
         deveRejeitarAcessoPorMesaInexistente();
+    }
+
+    @Test
+    @DisplayName("@spec:AC-011 Quando um solicitante acessar de novo, registrar uma nova solicitação")
+    void cenario_5() {
+        dadoMesa();
+        dadoSessaoAtiva();
+        dadoEntradaNaoPermitida();
+        quandoAcessar();
+        quandoAcessar();
+        deveRegistrarNovaSolicitacaoACadaAcesso();
     }
 
     private void dadoMesa() {
@@ -204,6 +216,11 @@ class AcessarSessaoUseCaseTest {
 
     private void deveRetornarPermissaoRequerida() {
         assertEquals(StatusAcessoSessao.PERMISSAO_REQUERIDA, response.status());
+    }
+
+    private void deveRegistrarNovaSolicitacaoACadaAcesso() {
+        verify(solicitacaoEntradaSessaoRepository, times(2))
+                .save(any(SolicitacaoEntradaSessao.class));
     }
 
     private void naoDeveCriarNovaSessao() {
