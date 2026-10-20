@@ -95,11 +95,11 @@ Como participante da sessão, quero ver quem está na sessão da mesa, para que 
 - **Quando** um participante consulta os participantes da sessão
 - **Então** ele vê o nome de cada participante da sessão (lista com sessão, token e nome)
 
-#### AC-013 — Sessão sem participantes retorna lista vazia
+#### AC-013 — Quem não participa não vê os participantes
 
-- **Dado** uma sessão sem participantes
-- **Quando** alguém consulta os participantes da sessão
-- **Então** a lista volta vazia
+- **Dado** uma sessão com participantes
+- **Quando** alguém que não é participante dessa sessão (token inexistente ou de outra sessão) consulta os participantes
+- **Então** a consulta é recusada e nenhum participante é exibido (não encontrado, 404)
 
 ## Fora de escopo
 
@@ -121,5 +121,5 @@ Como participante da sessão, quero ver quem está na sessão da mesa, para que 
 | ID | Pergunta | Status | Resposta |
 |---|---|---|---|
 | Q-001 | Solicitação pendente expira? Após quanto tempo? | respondida | Expira em 3 minutos (AC-010) |
-| Q-003 | A listagem de participantes (`GET /participantes/{sessaoId}`) deve exigir o token de um participante da sessão, como a listagem de solicitações exige? Hoje qualquer pessoa com o id da sessão consegue listar | aberta | — |
+| Q-003 | A listagem de participantes (`GET /participantes/{sessaoId}`) deve exigir o token de um participante da sessão, como a listagem de solicitações exige? Hoje qualquer pessoa com o id da sessão consegue listar | respondida | Sim: exige o token de um participante da sessão (AC-012, AC-013) |
 | Q-002 | Solicitante recusado pode pedir de novo? | respondida | Pode, mas precisa reiniciar o fluxo (escanear o QR / chamar a API de novo) (AC-011) |
