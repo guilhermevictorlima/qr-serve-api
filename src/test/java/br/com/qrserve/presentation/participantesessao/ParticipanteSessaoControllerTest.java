@@ -17,7 +17,6 @@ import java.util.List;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -77,7 +76,7 @@ class ParticipanteSessaoControllerTest {
 
         quandoListarParticipantes("5")
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().string(MENSAGEM_ERRO_INESPERADO));
+                .andExpect(jsonPath("$.mensagem").value(MENSAGEM_ERRO_INESPERADO));
     }
 
     private void dadoParticipantesNaSessao(Integer sessaoId) {

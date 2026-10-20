@@ -31,7 +31,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -73,7 +72,7 @@ class PedidoControllerTest {
 
         quandoRealizarPedido(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.tokenUsuario")
+                .andExpect(jsonPath("$.campos.tokenUsuario")
                         .value("O token de usuário é obrigatório para criar pedido"));
 
         deveNaoCriarPedido();
@@ -86,7 +85,7 @@ class PedidoControllerTest {
 
         quandoRealizarPedido(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.tokenUsuario")
+                .andExpect(jsonPath("$.campos.tokenUsuario")
                         .value("O token de usuário é obrigatório para criar pedido"));
 
         deveNaoCriarPedido();
@@ -99,7 +98,7 @@ class PedidoControllerTest {
 
         quandoRealizarPedido(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.menuItemId")
+                .andExpect(jsonPath("$.campos.menuItemId")
                         .value("O identificador do item de menu é obrigatório para criar pedido"));
 
         deveNaoCriarPedido();
@@ -112,7 +111,7 @@ class PedidoControllerTest {
 
         quandoRealizarPedido(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.quantidade")
+                .andExpect(jsonPath("$.campos.quantidade")
                         .value("A quantidade de itens é obrigatória para criar pedido"));
 
         deveNaoCriarPedido();
@@ -125,7 +124,7 @@ class PedidoControllerTest {
 
         quandoRealizarPedido(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.quantidade")
+                .andExpect(jsonPath("$.campos.quantidade")
                         .value("A quantidade de itens deve ser maior que zero para criar pedido"));
 
         deveNaoCriarPedido();
@@ -163,7 +162,7 @@ class PedidoControllerTest {
 
         quandoRealizarPedido(form)
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Usuário não reconhecido, por favor tente novamente"));
+                .andExpect(jsonPath("$.mensagem").value("Usuário não reconhecido, por favor tente novamente"));
     }
 
     @Test
@@ -174,7 +173,7 @@ class PedidoControllerTest {
 
         quandoRealizarPedido(form)
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Não foi encontrado o item do menu para realizar o pedido, tente novamente"));
+                .andExpect(jsonPath("$.mensagem").value("Não foi encontrado o item do menu para realizar o pedido, tente novamente"));
     }
 
     @Test
@@ -185,7 +184,7 @@ class PedidoControllerTest {
 
         quandoRealizarPedido(form)
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().string(MENSAGEM_ERRO_INESPERADO));
+                .andExpect(jsonPath("$.mensagem").value(MENSAGEM_ERRO_INESPERADO));
     }
 
     @Test
@@ -204,7 +203,7 @@ class PedidoControllerTest {
 
         quandoCancelarPedido("1")
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Pedido não encontrado"));
+                .andExpect(jsonPath("$.mensagem").value("Pedido não encontrado"));
     }
 
     @Test
@@ -214,7 +213,7 @@ class PedidoControllerTest {
 
         quandoCancelarPedido("1")
                 .andExpect(status().isConflict())
-                .andExpect(content().string("O pedido precisa estar em aberto para ser cancelado"));
+                .andExpect(jsonPath("$.mensagem").value("O pedido precisa estar em aberto para ser cancelado"));
     }
 
     @Test
@@ -233,7 +232,7 @@ class PedidoControllerTest {
 
         quandoCancelarPedido("1")
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().string(MENSAGEM_ERRO_INESPERADO));
+                .andExpect(jsonPath("$.mensagem").value(MENSAGEM_ERRO_INESPERADO));
     }
 
     @Test
@@ -243,7 +242,7 @@ class PedidoControllerTest {
 
         quandoCancelarPedido("1")
                 .andExpect(status().isConflict())
-                .andExpect(content().string("O recurso foi alterado por outra operação, tente novamente"));
+                .andExpect(jsonPath("$.mensagem").value("O recurso foi alterado por outra operação, tente novamente"));
     }
 
     @Test
@@ -253,7 +252,7 @@ class PedidoControllerTest {
 
         quandoConcluirPedido("1")
                 .andExpect(status().isConflict())
-                .andExpect(content().string("O recurso foi alterado por outra operação, tente novamente"));
+                .andExpect(jsonPath("$.mensagem").value("O recurso foi alterado por outra operação, tente novamente"));
     }
 
     @Test
@@ -272,7 +271,7 @@ class PedidoControllerTest {
 
         quandoConcluirPedido("1")
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Pedido não encontrado"));
+                .andExpect(jsonPath("$.mensagem").value("Pedido não encontrado"));
     }
 
     @Test
@@ -282,7 +281,7 @@ class PedidoControllerTest {
 
         quandoConcluirPedido("1")
                 .andExpect(status().isConflict())
-                .andExpect(content().string("O pedido precisa estar em aberto para ser concluído"));
+                .andExpect(jsonPath("$.mensagem").value("O pedido precisa estar em aberto para ser concluído"));
     }
 
     @Test
@@ -301,7 +300,7 @@ class PedidoControllerTest {
 
         quandoConcluirPedido("1")
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().string(MENSAGEM_ERRO_INESPERADO));
+                .andExpect(jsonPath("$.mensagem").value(MENSAGEM_ERRO_INESPERADO));
     }
 
     @Test

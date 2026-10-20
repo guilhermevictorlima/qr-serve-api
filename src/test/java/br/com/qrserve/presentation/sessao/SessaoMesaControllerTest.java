@@ -29,7 +29,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -80,7 +79,7 @@ class SessaoMesaControllerTest {
 
         quandoAcessarSessao(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.mesaId")
+                .andExpect(jsonPath("$.campos.mesaId")
                         .value("O identificador da mesa é obrigatório para acessar a sessão"));
 
         deveNaoAcessarSessao();
@@ -93,7 +92,7 @@ class SessaoMesaControllerTest {
 
         quandoAcessarSessao(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.nome")
+                .andExpect(jsonPath("$.campos.nome")
                         .value("O nome é obrigatório para acessar a sessão"));
 
         deveNaoAcessarSessao();
@@ -106,7 +105,7 @@ class SessaoMesaControllerTest {
 
         quandoAcessarSessao(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.nome")
+                .andExpect(jsonPath("$.campos.nome")
                         .value("O nome é obrigatório para acessar a sessão"));
 
         deveNaoAcessarSessao();
@@ -119,7 +118,7 @@ class SessaoMesaControllerTest {
 
         quandoAcessarSessao(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.nome")
+                .andExpect(jsonPath("$.campos.nome")
                         .value("O nome é obrigatório para acessar a sessão"));
 
         deveNaoAcessarSessao();
@@ -142,7 +141,7 @@ class SessaoMesaControllerTest {
 
         quandoAcessarSessao(form)
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().string(MENSAGEM_ERRO_INESPERADO));
+                .andExpect(jsonPath("$.mensagem").value(MENSAGEM_ERRO_INESPERADO));
     }
 
     @Test
@@ -164,7 +163,7 @@ class SessaoMesaControllerTest {
 
         quandoResponderSolicitacao(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.tokenUsuarioSolicitante")
+                .andExpect(jsonPath("$.campos.tokenUsuarioSolicitante")
                         .value("O token do usuário solicitante é obrigatório para responder a solicitação"));
 
         deveNaoResponderSolicitacao();
@@ -177,7 +176,7 @@ class SessaoMesaControllerTest {
 
         quandoResponderSolicitacao(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.tokenUsuarioSolicitante")
+                .andExpect(jsonPath("$.campos.tokenUsuarioSolicitante")
                         .value("O token do usuário solicitante é obrigatório para responder a solicitação"));
 
         deveNaoResponderSolicitacao();
@@ -190,7 +189,7 @@ class SessaoMesaControllerTest {
 
         quandoResponderSolicitacao(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.tokenUsuarioRespondente")
+                .andExpect(jsonPath("$.campos.tokenUsuarioRespondente")
                         .value("O token do usuário respondente é obrigatório para responder a solicitação"));
 
         deveNaoResponderSolicitacao();
@@ -203,7 +202,7 @@ class SessaoMesaControllerTest {
 
         quandoResponderSolicitacao(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.tokenUsuarioRespondente")
+                .andExpect(jsonPath("$.campos.tokenUsuarioRespondente")
                         .value("O token do usuário respondente é obrigatório para responder a solicitação"));
 
         deveNaoResponderSolicitacao();
@@ -216,7 +215,7 @@ class SessaoMesaControllerTest {
 
         quandoResponderSolicitacao(form)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.resposta")
+                .andExpect(jsonPath("$.campos.resposta")
                         .value("A resposta da solicitação é obrigatória para responder a solicitação"));
 
         deveNaoResponderSolicitacao();
@@ -241,7 +240,7 @@ class SessaoMesaControllerTest {
 
         quandoResponderSolicitacao(form)
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Solicitação de entrada não encontrada"));
+                .andExpect(jsonPath("$.mensagem").value("Solicitação de entrada não encontrada"));
     }
 
     @Test
@@ -252,7 +251,7 @@ class SessaoMesaControllerTest {
 
         quandoResponderSolicitacao(form)
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Participante respondente não encontrado"));
+                .andExpect(jsonPath("$.mensagem").value("Participante respondente não encontrado"));
     }
 
     @Test
@@ -263,7 +262,7 @@ class SessaoMesaControllerTest {
 
         quandoResponderSolicitacao(form)
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().string(MENSAGEM_ERRO_INESPERADO));
+                .andExpect(jsonPath("$.mensagem").value(MENSAGEM_ERRO_INESPERADO));
     }
 
     private AcessarSessaoMesaForm dadoFormularioDeAcessoValido() {

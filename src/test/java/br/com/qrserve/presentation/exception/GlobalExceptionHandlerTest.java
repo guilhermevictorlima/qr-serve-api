@@ -12,8 +12,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GlobalExceptionHandlerTest {
@@ -65,6 +63,8 @@ class GlobalExceptionHandlerTest {
     @SuppressWarnings("unchecked")
     private void deveRetornarMensagensDoCampo(String campo, String mensagemEsperada) {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals(mensagemEsperada, ((Map<String, String>) response.getBody()).get(campo));
+        var corpo = (ErroResponse) response.getBody();
+        assertEquals("Requisição inválida", corpo.mensagem());
+        assertEquals(mensagemEsperada, corpo.campos().get(campo));
     }
 }
