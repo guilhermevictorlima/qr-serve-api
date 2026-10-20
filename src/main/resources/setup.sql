@@ -128,6 +128,9 @@ CREATE TABLE sessao_mesa
 
 CREATE INDEX idx_sessao_mesa_mesa_id ON sessao_mesa (mesa_id);
 
+-- Garante no máximo uma sessão ativa por mesa
+CREATE UNIQUE INDEX uq_sessao_mesa_ativa_por_mesa ON sessao_mesa (mesa_id) WHERE data_hora_encerramento IS NULL;
+
 CREATE TABLE participante_sessao
 (
     id        INTEGER GENERATED ALWAYS AS IDENTITY,
@@ -174,6 +177,8 @@ CREATE TABLE pedido (
     status                  VARCHAR(30) NOT NULL,
     data_hora_pedido        TIMESTAMP NOT NULL,
     data_hora_cancelamento  TIMESTAMP,
+    data_hora_conclusao     TIMESTAMP,
+    versao                  BIGINT NOT NULL DEFAULT 0,
 
     CONSTRAINT pk_pedido PRIMARY KEY (id),
     CONSTRAINT fk_pedido_participante_sessao FOREIGN KEY (participante_sessao_id)
