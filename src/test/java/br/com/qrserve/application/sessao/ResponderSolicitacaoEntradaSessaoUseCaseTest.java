@@ -1,5 +1,7 @@
 package br.com.qrserve.application.sessao;
 
+import br.com.qrserve.application.time.TimeProvider;
+import br.com.qrserve.domain.exception.EstadoInvalidoException;
 import br.com.qrserve.domain.exception.SolicitacaoEntradaSessaoNaoEncontradaException;
 import br.com.qrserve.domain.exception.ParticipanteSessaoNaoEncontradoException;
 import br.com.qrserve.domain.sessao.ParticipanteSessao;
@@ -8,6 +10,7 @@ import br.com.qrserve.domain.sessao.SolicitacaoEntradaSessao;
 import br.com.qrserve.domain.sessao.TokenUsuario;
 import br.com.qrserve.infrastructure.persistence.sessao.ParticipanteSessaoRepository;
 import br.com.qrserve.infrastructure.persistence.sessao.SolicitacaoEntradaSessaoRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,11 +44,16 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
     @Mock
     private FeedbackSender feedbackSender;
 
+    @Mock
+    private TimeProvider timeProvider;
+
     @Captor
     private ArgumentCaptor<ParticipanteSessao> participanteArgumentCaptor;
 
     @InjectMocks
     private ResponderSolicitacaoEntradaSessaoUseCase useCase;
+
+    private static final LocalDateTime DATA_HORA_SOLICITACAO = LocalDateTime.of(2026, 9, 1, 13, 2, 15);
 
     private String tokenSolicitante;
     private String tokenRespondente;
@@ -56,8 +65,24 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
     private Class<? extends Exception> tipoEsperadoException;
     private String mensagemEsperadaException;
 
+    @BeforeEach
+    void setUp() {
+        lenient().when(timeProvider.dataHoraAtual()).thenReturn(DATA_HORA_SOLICITACAO.plusMinutes(1));
+    }
+
     @Test
-    @DisplayName("@spec:AC-007 Quando a solicitação for aprovada, adicionar o solicitante à sessão")
+    @DisplayName("@spec:AC-010 Quando a solicitação estiver expirada, rejeitar a resposta")
+    void cenario_6() {
+        dadoSolicitacaoDeEntrada();
+        dadoParticipanteRespondente();
+        dadoRespostaAprovada();
+        dadoSolicitacaoExpirada();
+        quandoResponderSolicitacao();
+        deveRejeitarResposta();
+    }
+
+    @Test
+    @DisplayName("@spec:AC-007Quando a solicitação for aprovada, adicionar o solicitante à sessão")
     void cenario_1() {
         dadoSolicitacaoDeEntrada();
         dadoParticipanteRespondente();
@@ -119,7 +144,7 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
         TokenUsuario token = TokenUsuario.create();
         tokenSolicitante = token.getValor();
 
-        return new SolicitacaoEntradaSessao(new SessaoMesa(1), token, "Fulano", LocalDateTime.of(2026, 9, 1, 13, 2, 15));
+        return new SolicitacaoEntradaSessao(new SessaoMesa(1), token, "Fulano", DATA_HORA_SOLICITACAO);
     }
 
     private void dadoParticipanteRespondente() {
@@ -151,6 +176,14 @@ class ResponderSolicitacaoEntradaSessaoUseCaseTest {
                 tokenRespondente,
                 RespostaSolicitacao.NEGADA
         );
+    }
+
+    private void dadoSolicitacaoExpirada() {
+        when(timeProvider.dataHoraAtual())
+                .thenReturn(DATA_HORA_SOLICITACAO.plusMinutes(3).plusSeconds(1));
+
+        mensagemEsperadaException = "Solicitação de entrada expirada. Escaneie o QR Code novamente";
+        tipoEsperadoException = EstadoInvalidoException.class;
     }
 
     private void dadoSolicitacaoInexistente() {
